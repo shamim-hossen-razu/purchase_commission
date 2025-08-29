@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+{
+    'name': "Purchase Commission",
+
+    'summary': "This module allow a commission for customer upon achieving a target amount of purchase at the end of the fiscal year",
+
+    'description': """
+        Sale manager can set rules for purchase target commission.
+        Rule consists of a name, a purchase target amount, a percentage of commission, fiscal year.
+        A commission record is automatically linked to the customer record when they are eligiable.
+        A manual mode for creating customer wise commission is also available.
+    """,
+
+    'author': "Shamim Hossen Razu",
+    'website': "https://www.myodootest.space",
+    'category': 'Sales/CRM',
+
+    # Categories can be used to filter modules in modules listing
+    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
+    # for the full list
+    'version': '0.1',
+
+    # any module necessary for this one to work correctly
+    'depends': ['base', 'sale_management', 'accountant'],
+
+    # always loaded
+    'data': [
+        'security/ir.model.access.csv',
+        'views/customer_commission_config_views.xml',
+        'views/commission_menu.xml',
+        'views/res_partner_views.xml',
+    ],
+    # only loaded in demonstration mode
+    'demo': [
+        'demo/demo.xml',
+    ],
+}

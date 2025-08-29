@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_partner_commission_view" model="ir.ui.view">
+        <field name="name">res.partner.commission.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook/page[@name='contact_addresses']" position="after">
+                <page string="Commission Info">
+                    <field name="partner_commission_ids">
+                        <list string="Commissions">
+                            <field name="partner_id"/>
+                            <field name="fiscal_year_id"/>
+                            <field name="commission_amount"/>
+                            <field name="state"/>
+                        </list>
+                        <form>
+                            <sheet>
+                                <button string="Update Commission Rules" type="object" name="action_update_commission_rules" class="oe_highlight"/>
+                                <group>
+                                    <group>
+                                        <field name="fiscal_year_id"/>
+                                        <field name="partner_id"/>
+                                        <field name="commission_rule_id" readonly="True"/>
+                                        <field name="commission_amount" readonly="True"/>
+                                        <field name="state"/>
+                                    </group>
+                                    <group>
+                                        <field name="total_purchase"/>
+                                        <field name="total_invoiced"/>
+                                        <field name="total_paid"/>
+                                        <field name="total_due"/>
+                                    </group>
+                                </group>
+
+                            </sheet>
+                        </form>
+
+                    </field>
+                </page>
+
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem id="partner_commission"
+              name="Commissions"
+              parent="sale.menu_sale_config"
+              sequence="10">
+        <menuitem id="menu_customer_discount_config"
+                  name="Customer Commission Rules"
+                  action="action_customer_discount_config"
+                  groups="sales_team.group_sale_manager,sales_team.group_sale_salesman"
+                  sequence="10"/>
+    </menuitem>
+</odoo>
