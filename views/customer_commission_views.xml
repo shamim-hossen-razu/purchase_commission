@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_customer_commission_form_view" model="ir.ui.view">
+        <field name="name">customer.commission.form</field>
+        <field name="model">customer.commission</field>
+        <field name="arch" type="xml">
+            <form string="Customer Commission">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_credit_notes"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <header>
+                        <button string="Check Eligibility" type="object" name="action_update_commission_rules"
+                                class="oe_highlight" invisible="state in ['eligible', 'in_payment', 'paid']"/>
+                        <button string="Make Payment" type="object" name="action_make_payment"
+                                class="oe_highlight" invisible="state != 'eligible'"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <group>
+                        <group>
+                            <field name="fiscal_year_id" readonly="True"/>
+                            <field name="partner_id" readonly="True"/>
+                            <field name="commission_rule_id" readonly="True"/>
+                            <field name="commission_amount" readonly="True"/>
+                        </group>
+                        <group>
+                            <field name="total_purchase"/>
+                            <field name="total_invoiced"/>
+                            <field name="total_paid"/>
+                            <field name="total_due"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="customer_commission_list_view" model="ir.ui.view">
+        <field name="name">customer.commission.list</field>
+        <field name="model">customer.commission</field>
+        <field name="arch" type="xml">
+            <list string="Customer Commissions">
+                <field name="partner_id"/>
+                <field name="fiscal_year_id"/>
+                <field name="total_purchase" sum="Total"/>
+                <field name="total_invoiced" sum="Total"/>
+                <field name="total_paid" sum="Total"/>
+                <field name="total_due" sum="Total"/>
+                <field name="commission_rule_id"/>
+                <field name="commission_amount" sum="Total"/>
+                <field name="state"
+                           string="Status"
+                           widget="badge"
+                           decoration-info="state == 'draft'"
+                           decoration-danger="state == 'applicable'"
+                           decoration-warning="state == 'eligible'"
+                           decoration-success="state == 'paid'"
+                    />
+            </list>
+        </field>
+    </record>
+
+    <record id="action_customer_commission" model="ir.actions.act_window">
+        <field name="name">Customer Commissions</field>
+        <field name="res_model">customer.commission</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>
+                This section displays the commissions earned by customers based on their purchase activities.
+                You can view detailed information about each customer's purchases, invoices, payments, and the
+                corresponding commission amounts.
+            </p>
+        </field>
+    </record>
+</odoo>

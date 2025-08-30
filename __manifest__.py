@@ -29,6 +29,7 @@
         'views/customer_commission_config_views.xml',
         'views/commission_menu.xml',
         'views/res_partner_views.xml',
+        'views/customer_commission_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

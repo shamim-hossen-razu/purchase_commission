@@ -1,45 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="res_partner_commission_view" model="ir.ui.view">
-        <field name="name">res.partner.commission.form</field>
+
+    <record id="res_partner_commission_view_buttons" model="ir.ui.view">
+        <field name="name">res.partner.commission.view.buttons</field>
         <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="priority" eval="3"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet/notebook/page[@name='contact_addresses']" position="after">
-                <page string="Commission Info">
-                    <field name="partner_commission_ids">
-                        <list string="Commissions">
-                            <field name="partner_id"/>
-                            <field name="fiscal_year_id"/>
-                            <field name="commission_amount"/>
-                            <field name="state"/>
-                        </list>
-                        <form>
-                            <sheet>
-                                <button string="Update Commission Rules" type="object" name="action_update_commission_rules" class="oe_highlight"/>
-                                <group>
-                                    <group>
-                                        <field name="fiscal_year_id"/>
-                                        <field name="partner_id"/>
-                                        <field name="commission_rule_id" readonly="True"/>
-                                        <field name="commission_amount" readonly="True"/>
-                                        <field name="state"/>
-                                    </group>
-                                    <group>
-                                        <field name="total_purchase"/>
-                                        <field name="total_invoiced"/>
-                                        <field name="total_paid"/>
-                                        <field name="total_due"/>
-                                    </group>
-                                </group>
-
-                            </sheet>
-                        </form>
-
-                    </field>
-                </page>
-
-            </xpath>
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="object" name="action_view_partner_commission"
+                    groups="sales_team.group_sale_salesman"
+                    invisible="commission_count==0"
+                    icon="fa-percent">
+                    <field string="Commissions" name="commission_count" widget="statinfo"
+                    invisible="commission_count==0"/>
+                </button>
+            </div>
         </field>
     </record>
 
