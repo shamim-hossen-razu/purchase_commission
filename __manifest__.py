@@ -21,7 +21,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale_management', 'accountant'],
+    'depends': ['base', 'sale_management', 'accountant', 'stock', 'purchase'],
 
     # always loaded
     'data': [
@@ -30,6 +30,7 @@
         'views/commission_menu.xml',
         'views/res_partner_views.xml',
         'views/customer_commission_views.xml',
+        'views/sale_order_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

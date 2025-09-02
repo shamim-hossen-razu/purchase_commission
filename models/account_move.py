@@ -35,7 +35,4 @@ class AccountMove(models.Model):
                         new_commission_record.recompute_all()
                     else:
                         commission.recompute_all()
-            if move.move_type == 'out_refund' and move.commission_id:
-                if move.payment_state == 'paid':
-                    move.commission_id.write({'state': 'paid'})
         return super(AccountMove, self).write(vals)

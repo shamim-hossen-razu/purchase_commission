@@ -7,63 +7,9 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-
-                <field name="partner_id" position="after">
-                    <field name="total_purchase_in_running_year"
-                           widget="monetary"
-                           readonly="1"
-                           string="Total Sales In Running FY"
-                           help="Total confirmed sales for this customer in current fiscal year"
-                           invisible="total_purchase_in_running_year == 0"/>
-
-                    <field name="purchase_target_achievement_discount"
-                           readonly="1"
-                           string="Target Achievement Discount %"
-                           help="Automatic discount based on customer's fiscal year purchases"
-                           invisible="purchase_target_achievement_discount == 0"/>
-
-                    <field name="purchase_target_achievement_discount_rule_applied"
-                           readonly="1"
-                           string="Applied Discount Rule"
-                           help="Name of the discount rule being applied"
-                           invisible="purchase_target_achievement_discount_rule_applied == ''"/>
-
-                    <!-- Hidden field to track application status -->
-                    <field name="purchase_target_achievement_discount_rule" invisible="1"/>
-                </field>
-
-                <!-- Conditional Buttons -->
-                <button name="action_confirm" position="before">
-
-                    <!-- Apply Discount Button - Show only when discount available but NOT applied -->
-                    <button name="apply_purchase_target_achievement_discount"
-                            type="object"
-                            string="Apply Target Achievement Discount"
-                            class="btn-primary"
-                            invisible="purchase_target_achievement_discount == 0 or state not in ['draft', 'sent'] or purchase_target_achievement_discount_rule_applied"
-                            help="Apply automatic discount to all order lines"/>
-
-                    <!-- Withdraw Discount Button - Show only when discount is applied -->
-                    <button name="withdraw_auto_discount"
-                            type="object"
-                            string="Withdraw Discount"
-                            class="btn-warning"
-                            invisible="purchase_target_achievement_discount == 0 or state not in ['draft', 'sent'] or not purchase_target_achievement_discount_rule_applied"
-                            help="Remove automatic discount from all order lines"/>
-
-                    <!-- Status indicator with alert styling -->
-                    <div class="alert alert-success d-inline-block mb-0 py-1 px-2"
-                         role="status"
-                         aria-live="polite"
-                         invisible="not purchase_target_achievement_discount_rule_applied"
-                         style="margin-left: 8px;">
-                        <i class="fa fa-check-circle" title="Discount applied successfully" aria-hidden="true"></i>
-                        <strong>Target Achievement Discount Applied:</strong>
-                        <field name="purchase_target_achievement_discount" readonly="1"/>%
-                    </div>
-
-                </button>
-
+                <xpath expr="//page[@name='order_lines']//field[@name='order_line']/list//field[@name='product_packaging_qty']" position="after">
+                    <field name="set_name"/>
+                </xpath>
             </field>
         </record>
     </data>

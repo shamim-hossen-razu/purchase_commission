@@ -42,11 +42,26 @@
         </field>
     </record>
 
+    <record id="customer_commission_config_search_view" model="ir.ui.view">
+        <field name="name">customer.commission.config.search</field>
+        <field name="model">customer.commission.config</field>
+        <field name="arch" type="xml">
+            <search string="Customer Commission Configuration">
+                <field name="name"/>
+                <field name="fiscal_year_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <group expand="0" string="Group By">
+                    <filter string="Fiscal Year" name="group_fiscal_year_id" context="{'group_by': 'fiscal_year_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <!-- Action -->
     <record id="action_customer_discount_config" model="ir.actions.act_window">
         <field name="name">Customer Commission Rules</field>
         <field name="res_model">customer.commission.config</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,form,search</field>
         <field name="target">current</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

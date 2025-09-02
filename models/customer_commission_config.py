@@ -4,7 +4,6 @@ from num2words import num2words
 from odoo.addons.purchase_commission.utils.number_utils import number_to_words_bangladesh
 
 
-
 class CustomerDiscountConfig(models.Model):
     _name = 'customer.commission.config'
     _description = 'Customer Commission Configuration'
@@ -22,7 +21,8 @@ class CustomerDiscountConfig(models.Model):
         string='Fiscal Year',
         default=lambda self: self._get_default_fiscal_year(),
         help="Leave empty to apply to current fiscal year",
-        tracking=True
+        tracking=True,
+        copy=False
     )
 
     @api.model
@@ -52,7 +52,7 @@ class CustomerDiscountConfig(models.Model):
     def _check_values(self):
         for record in self:
             if record.purchase_target <= 0:
-                raise ValidationError("Sales target must be greater than zero!")
+                raise ValidationError("Purchase target must be greater than zero!")
             if record.commission_percent < 1 or record.commission_percent > 100:
                 raise ValidationError("Discount percentage must be between 1 and 100!")
 

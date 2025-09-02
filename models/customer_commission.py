@@ -18,7 +18,7 @@ class CustomerCommission(models.Model):
         ('eligible', 'Eligible'),
         ('in_payment', 'In Payment'),
         ('paid', 'Paid')
-    ], string='Status', default='draft', required=True)
+    ], string='Status', default='draft', compute='_compute_state', required=True)
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env.company)
     fiscal_year_id = fields.Many2one(
@@ -31,6 +31,16 @@ class CustomerCommission(models.Model):
     total_paid = fields.Float(string='Total Paid This Year', compute='_compute_total_paid')
     total_due = fields.Float(string='Total Due This Year', compute='_compute_total_due')
     invoice_count = fields.Integer(compute='_compute_invoice_count')
+    payment_date = fields.Date(string='Payment Date', compute='_compute_payment_date', store=True)
+    account_move_id = fields.Many2one('account.move', string='Credit Note', readonly=True)
+
+    @api.constrains('payment_date')
+    def _check_payment_date(self):
+        """payment date must be after the fiscal year end date"""
+        for record in self:
+            if record.payment_date and record.fiscal_year_id:
+                if record.payment_date < record.fiscal_year_id.date_to:
+                    raise ValidationError("Payment date must be after the fiscal year end date!")
 
     def _compute_invoice_count(self):
         for record in self:
@@ -72,26 +82,40 @@ class CustomerCommission(models.Model):
             else:
                 record.commission_amount = 0.0
 
+    @api.onchange('partner_id', 'fiscal_year_id', 'total_purchase', 'total_invoiced', 'total_paid', 'total_due')
+    def update_commission_rule(self):
+        self.action_update_commission_rules()
+
     def action_update_commission_rules(self):
         for record in self:
             if record.partner_id and record.fiscal_year_id:
-                total_purchases = record.total_purchase
                 commission_rules = self.env['customer.commission.config'].search([
-                    ('purchase_target', '<=', total_purchases),
+                    ('purchase_target', '<=', record.total_invoiced),
                     ('company_id', '=', record.company_id.id),
                     ('fiscal_year_id', '=', record.fiscal_year_id.id),
                     ('active', '=', True)
                 ], order='purchase_target desc')
                 if commission_rules:
                     record.commission_rule_id = commission_rules[0]
-                    if record.total_due > 0 and record.commission_amount > 0:
-                        record.state = 'applicable'
-                    if record.commission_amount > 0 and record.total_due == 0:
-                        record.state = 'eligible'
                 else:
                     record.commission_rule_id = False
             else:
                 record.commission_rule_id = False
+
+    @api.depends('commission_rule_id', 'commission_amount', 'total_due', 'invoice_count', 'account_move_id.status_in_payment')
+    def _compute_state(self):
+        for record in self:
+            if not record.commission_rule_id or record.total_due > 0:
+                record.state = 'draft'
+            if record.commission_rule_id and record.total_due > 0 and record.commission_amount > 0:
+                record.state = 'applicable'
+            if record.commission_amount > 0 and record.total_due == 0 and record.invoice_count == 0:
+                record.state = 'eligible'
+            if record.commission_amount > 0 and record.total_due == 0 and record.invoice_count > 0:
+                if record.account_move_id and record.account_move_id.status_in_payment == 'paid':
+                    record.state = 'paid'
+                else:
+                    record.state = 'in_payment'
 
     def recompute_all(self):
         for record in self:
@@ -101,7 +125,6 @@ class CustomerCommission(models.Model):
             record._compute_total_due()
             record.action_update_commission_rules()
             record._compute_commission_amount()
-
 
     @api.depends('partner_id', 'fiscal_year_id')
     def _compute_total_purchase(self):
@@ -175,6 +198,9 @@ class CustomerCommission(models.Model):
     def action_make_payment(self):
         """Create a credit note for commission payment to customer"""
         self.ensure_one()
+        # if todays date in not after fiscal year end date, raise error
+        if fields.Date.today() <= self.fiscal_year_id.date_to:
+            raise ValidationError("You can only make a payment after the fiscal year end date!")
 
         # Check if commission product exists, create if not
         commission_product = self.env['product.product'].search([
@@ -212,10 +238,10 @@ class CustomerCommission(models.Model):
         }
 
         credit_note = self.env['account.move'].create(invoice_vals)
-        # credit_note.action_post()
+        credit_note.action_post()
 
         # Update commission state
-        self.write({'state': 'in_payment'})
+        self.write({'account_move_id': credit_note.id, 'state': 'in_payment'})
 
         # Return action to view the created credit note
         return {
@@ -225,4 +251,16 @@ class CustomerCommission(models.Model):
             'res_model': 'account.move',
             'res_id': credit_note.id,
         }
+
+    @api.depends('state', 'account_move_id.status_in_payment', 'account_move_id.matched_payment_ids')
+    def _compute_payment_date(self):
+        for record in self:
+            if record.account_move_id and record.account_move_id.status_in_payment == 'paid':
+                payment = record.account_move_id.matched_payment_ids.filtered(lambda p: p.payment_type == 'outbound' and p.state == 'paid')
+                if payment:
+                    record.payment_date = payment[0].date
+                else:
+                    record.payment_date = False
+            else:
+                record.payment_date = False
 
