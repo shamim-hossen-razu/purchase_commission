@@ -126,8 +126,17 @@
                                         <tr>
                                             <!-- Description: first line only -->
                                             <td name="td_name">
+                                                <!-- First line only -->
                                                 <t t-set="name_first_line" t-value="(line.name or '').split('\n')[0]"/>
-                                                <span t-out="name_first_line"/>
+                                                <!-- Crop -->
+                                                <t t-if="len(name_first_line) > 50">
+                                                    <span t-att-title="name_first_line">
+                                                        <t t-out="name_first_line[:50]"/>…
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span t-out="name_first_line"/>
+                                                </t>
                                             </td>
 
                                             <!-- Quantity (+ packaging) -->
