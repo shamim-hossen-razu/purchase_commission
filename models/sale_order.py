@@ -1,5 +1,6 @@
-from odoo import models
+from odoo import models, api
 from odoo.tools.misc import format_amount
+import re
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -55,3 +56,54 @@ class SaleOrder(models.Model):
             })
 
         return pages
+
+    # bangladesh standard mobile/phone number constraint
+    _re_bd_mobile = re.compile(
+        r'^(?:\+?880|0)?1[3-9]\d{8}$')  # BD mobile: 01XXXXXXXXX with 2nd digit 3–9; allow +880 / 880 / 0 prefixes
+    _re_bd_phone = re.compile(
+        r'^(?:\+?880|0)\d{8,11}$')  # BD landline (broad): allow +880 / 880 / 0 then 8–11 digits (area codes vary)
+
+    @staticmethod
+    def _sanitize_phone(num):
+        if not num:
+            return ''
+        num = num.strip()
+
+        if num.startswith('+'):
+            return '+' + re.sub(r'\D', '', num[1:])
+
+        return re.sub(r'\D', '', num)
+
+    def _is_valid_bd_number(self, number):
+        n = self._sanitize_phone(number)
+        if not n:
+            return False
+
+        return bool(self._re_bd_mobile.match(n) or self._re_bd_phone.match(n))
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id_bd_phone_check(self):
+        for order in self:
+            partner = order.partner_id
+            if not partner:
+                continue
+
+            cp = partner.commercial_partner_id or partner
+            candidates = [partner.phone, partner.mobile, cp.phone, cp.mobile]
+
+            is_bd = any(order._is_valid_bd_number(v) for v in candidates if v)
+
+            if not is_bd:
+                order.partner_id = False
+                return {
+                    'warning': {
+                        'title': 'Bangladeshi Number Required',
+                        'message': (
+                            'The selected customer does not have a valid Bangladeshi phone/mobile.\n'
+                            'Accepted examples:\n'
+                            '  Mobile: +8801XXXXXXXXX, 8801XXXXXXXXX, 01XXXXXXXXX\n'
+                            '  Landline: +880XXXXXXXXX (8–11 digits after prefix)\n'
+                            'Please correct the number on the Contact before assigning.'
+                        ),
+                    }
+                }
