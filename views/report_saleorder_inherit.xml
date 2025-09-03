@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_basic">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="data_report_margin_top" t-value="10"/>
+                <t t-set="company" t-value="user.company_id.sudo()"/>
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+                <t t-set="is_proforma" t-value="env.context.get('proforma', False) or is_pro_forma"/>
+                <t t-set="layout_document_title">
+                    <span t-if="is_proforma">Pro-Forma Invoice # </span>
+                    <span t-elif="o.state in ['draft','sent']">Quotation # </span>
+                    <span t-else="">Order # </span>
+                    <span t-field="o.name">SO0000</span>
+                </t>
+
+                <t t-call="web.basic_layout">
+                    <div class="page">
+                        <!-- Header Section -->
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-6">
+                                <!-- Company Logo -->
+                                <div class="mb-3">
+                                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height:80px;" alt="Company Logo"/>
+                                </div>
+
+                                <!-- Company Details -->
+                                <div class="company-details">
+                                    <span t-field="company.name"/>
+                                    <t t-set="company_street" t-value="', '.join(filter(lambda x:x, [company.street2, company.street, company.zip]))"/>
+                                    <div t-if="company_street" t-out="company_street"/>
+                                    <div t-if="company.country_id"> <span t-field="company.country_id"/></div>
+                                    <div t-if="company.phone"><i class="fa fa-phone" aria-hidden="true"/> <span t-field="company.phone"/></div>
+                                </div>
+                            </div>
+
+                            <div class="col-6" style="text-align: right; padding-bottom: 15px;">
+                                <h1><t t-out="layout_document_title"/></h1>
+                                <div>
+                                    <t t-if="(o.partner_shipping_id == o.partner_invoice_id and o.partner_invoice_id != o.partner_id)
+                                           or (o.partner_shipping_id != o.partner_invoice_id)">
+                                        <div class="col-6">
+                                            <strong>
+                                                <t t-if="o.partner_shipping_id == o.partner_invoice_id">
+                                                    Invoicing and Shipping Address
+                                                </t>
+                                                <t t-else="">Invoicing Address</t>
+                                            </strong>
+                                            <div t-field="o.partner_invoice_id"
+                                                 t-options='{"widget":"contact","fields":["address","name","phone"],"no_marker":True,"phone_icons":True}'/>
+                                        </div>
+
+                                        <div class="col-6" t-if="o.partner_shipping_id != o.partner_invoice_id">
+                                            <strong>Shipping Address</strong>
+                                            <div t-field="o.partner_shipping_id"
+                                                 t-options='{"widget":"contact","fields":["address","name","phone"],"no_marker":True,"phone_icons":True}'/>
+                                        </div>
+                                    </t>
+                                </div>
+
+                                <!-- ROW 3: Invoicing/Shipping address logic always -->
+                                <div>
+                                    <div t-field="o.partner_id"
+                                         t-options='{"widget":"contact","fields":["name","address"],"no_marker":True}'/>
+                                    <p t-if="o.partner_id.vat" class="m-0">
+                                        <t t-out="o.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>:
+                                        <span t-field="o.partner_id.vat"/>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="padding-bottom: 15px;">
+                            <div t-if="o.date_order" class="col">
+                                <strong t-if="is_proforma">Issued Date</strong>
+                                <strong t-elif="o.state in ['draft','sent']">Quotation Date</strong>
+                                <strong t-else="">Order Date: </strong>
+                                <div t-field="o.date_order" t-options='{"widget": "date"}'/>
+                            </div>
+
+                            <div t-if="o.validity_date and o.state in ['draft','sent']" class="col">
+                                <strong>Expiration: </strong>
+                                <div t-field="o.validity_date"/>
+                            </div>
+
+                            <div t-if="o.user_id.name" class="col">
+                                <strong>Salesperson: </strong>
+                                <div t-field="o.user_id"/>
+                            </div>
+                        </div>
+
+                        <!-- TABLE -->
+                        <t t-set="lines_to_report" t-value="o._get_order_lines_to_report()"/>
+                        <t t-set="printable_lines" t-value="[l for l in lines_to_report if not l.display_type]"/>
+                        <t t-set="has_discount_lines" t-value="[l for l in printable_lines if l.discount]"/>
+
+                        <table class="o_has_total_table table o_main_table table-borderless">
+                            <thead style="display: table-row-group">
+                                <tr>
+                                    <th class="text-start">Description</th>
+                                    <th class="text-end text-nowrap">Quantity</th>
+                                    <th class="text-end text-nowrap">Unit Price</th>
+                                    <th t-if="has_discount_lines" class="text-end">Disc.%</th>
+                                    <th class="text-end">Taxes</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tr>
+                                <td colspan="9" style="border-top: 1px solid #000; height: 5px;"/>
+                            </tr>
+                            <tbody class="sale_tbody">
+                                <!-- keep your original definitions above this tbody -->
+                                <t t-set="lines_to_report" t-value="o._get_order_lines_to_report()"/>
+                                <t t-set="printable_lines" t-value="[l for l in lines_to_report if not l.display_type]"/>
+                                <t t-set="has_discount_lines" t-value="[l for l in printable_lines if l.discount]"/>
+
+                                <!-- NEW: get paginated pages (17 first, 24 thereafter) -->
+                                <t t-set="pages" t-value="o._report_paginated_lines(17, 25)"/>
+                                <!-- columns count to compute colspan for the Page Subtotal label cell -->
+                                <t t-set="columns" t-value="6 if has_discount_lines else 5"/>
+
+                                <!-- Render each page chunk -->
+                                <t t-foreach="pages" t-as="page">
+                                    <!-- Render lines of this page -->
+                                    <t t-foreach="page['lines']" t-as="line">
+                                        <tr>
+                                            <!-- Description: first line only -->
+                                            <td name="td_name">
+                                                <t t-set="name_first_line" t-value="(line.name or '').split('\n')[0]"/>
+                                                <span t-out="name_first_line"/>
+                                            </td>
+
+                                            <!-- Quantity (+ packaging) -->
+                                            <td name="td_quantity"
+                                                t-attf-class="text-end {{ 'text-nowrap' if (not line.product_packaging_id or len(line.product_packaging_id.name) &lt; 10) else '' }}">
+                                                <span t-field="line.product_uom_qty"/>
+                                                <span t-field="line.product_uom"/>
+                                                <span t-if="line.product_packaging_id">
+                                                    (
+                                                    <span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/>
+                                                    <span t-field="line.product_packaging_id"/>
+                                                    )
+                                                </span>
+                                            </td>
+
+                                            <!-- Unit Price -->
+                                            <td class="text-end text-nowrap">
+                                                <span t-field="line.price_unit"/>
+                                            </td>
+
+                                            <!-- Discount (optional column) -->
+                                            <td t-if="has_discount_lines" class="text-end">
+                                                <span t-field="line.discount"/>
+                                            </td>
+
+                                            <!-- Taxes -->
+                                            <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_id])"/>
+                                            <td class="text-end">
+                                                <span t-out="taxes or '-'"/>
+                                            </td>
+
+                                            <!-- Amount (skip for downpayments) -->
+                                            <td class="text-end o_price_total">
+                                                <t t-if="line.price_subtotal">
+                                                    <span t-field="line.price_subtotal"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <!-- PAGE SUBTOTAL (for this chunk), shown only if not the last page -->
+                                    <tr t-if="page['show_subtotal']" class="o_page_subtotal">
+                                        <td t-att-colspan="columns - 1" class="text-end" style="border-top:1px solid #000;">
+                                            <strong>Page Subtotal</strong>
+                                        </td>
+                                        <td class="text-end" style="border-top:1px solid #000;">
+                                            <!-- Already currency-formatted in Python -->
+                                            <span t-esc="page['subtotal_display']"/>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Force page break after subtotal row so next chunk starts on a new page -->
+                                    <tr t-if="page['show_subtotal']">
+                                        <td t-att-colspan="columns" style="border:none; height:0; padding:0; page-break-after: always;"></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+
+                        </table>
+
+                        <div class="clearfix" name="so_total_summary">
+                            <div id="total" class="row mt-n3" name="total">
+                                <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
+                                    <table class="o_total_table table table-borderless">
+                                        <!-- thin line ABOVE the totals area -->
+                                        <tr>
+                                            <td colspan="2" style="border-top: 1px solid #000; height: 1px;"></td>
+                                        </tr>
+
+                                        <!-- Untaxed -->
+                                        <tr>
+                                            <td>Untaxed Amount</td>
+                                            <td class="text-end">
+                                                <span t-field="o.amount_untaxed"
+                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Tax (single rate display like standard screenshot) -->
+                                        <t t-set="base_for_tax" t-value="o.amount_untaxed or 0.0"/>
+                                        <t t-set="tax_amt" t-value="o.amount_tax or 0.0"/>
+                                        <t t-set="tax_rate"
+                                           t-value="(tax_amt and (tax_amt / (base_for_tax or 1.0) * 100.0)) or 0.0"/>
+                                        <tr>
+                                            <td>
+                                                <t t-out="'Tax {:.0f}% on $ {:,.2f}'.format(tax_rate, base_for_tax)"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-out="tax_amt"
+                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+
+                                        <!-- bold line BEFORE Total (this is the line you want) -->
+                                        <tr>
+                                            <td colspan="2" style="border-top: 1px solid #000; height: 2px;"></td>
+                                        </tr>
+
+                                        <!-- Total -->
+                                        <tr>
+                                            <td>
+                                                <strong>Total</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-field="o.amount_total"
+                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SIGNATURE -->
+                        <t t-if="o.signature">
+                            <div class="mt-4 ml64 mr4" name="signature">
+                                <div class="offset-8">
+                                    <strong>Signature</strong>
+                                </div>
+                                <div class="offset-8">
+                                    <img t-att-src="image_data_uri(o.signature)" style="max-height: 4cm; max-width: 8cm;"/>
+                                </div>
+                                <div class="offset-8 text-center">
+                                    <span t-field="o.signed_by">—</span>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- NOTES / PAYMENT TERMS / FISCAL POSITION REMARK -->
+                        <div class="mt-3">
+                            <span t-field="o.note"
+                                  t-attf-style="#{'text-align:justify;text-justify:inter-word;' if o.company_id.terms_type != 'html' else ''}"
+                                  name="order_note"/>
+                            <p t-if="not is_html_empty(o.payment_term_id.note)">
+                                <span t-field="o.payment_term_id.note"/>
+                            </p>
+
+                            <p t-if="o.fiscal_position_id and not is_html_empty(o.fiscal_position_id.sudo().note)"
+                               id="fiscal_position_remark">
+                                <strong>Fiscal Position Remark:</strong>
+                                <span t-field="o.fiscal_position_id.sudo().note"/>
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="custom_paperformat_purchase_order" model="report.paperformat">
+        <field name="name">Custom Paperformat</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="orientation">Portrait</field>
+    </record>
+
+    <record id="action_report_saleorder" model="ir.actions.report">
+        <field name="name">Quotation / Order New</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">purchase_commission.report_saleorder_basic</field>
+        <field name="report_file">purchase_commission.report_saleorder_basic</field>
+        <field name="print_report_name">
+            (object.state in ('draft', 'sent') and 'Quotation - %s' % (object.name)) or 'Order - %s' % (object.name)
+        </field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

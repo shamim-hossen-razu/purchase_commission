@@ -31,6 +31,7 @@
         'views/res_partner_views.xml',
         'views/customer_commission_views.xml',
         'views/sale_order_views.xml',
+        'views/report_saleorder_inherit.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
