@@ -99,9 +99,9 @@
                                 <tr>
                                     <th class="text-start">Description</th>
                                     <th class="text-end text-nowrap">Quantity</th>
+                                    <th class="text-end">Dozen/Pieces</th>
                                     <th class="text-end text-nowrap">Unit Price</th>
                                     <th t-if="has_discount_lines" class="text-end">Disc.%</th>
-                                    <th class="text-end">Taxes</th>
                                     <th class="text-end">Amount</th>
                                 </tr>
                             </thead>
@@ -129,9 +129,9 @@
                                                 <!-- First line only -->
                                                 <t t-set="name_first_line" t-value="(line.name or '').split('\n')[0]"/>
                                                 <!-- Crop -->
-                                                <t t-if="len(name_first_line) > 50">
+                                                <t t-if="len(name_first_line) > 40">
                                                     <span t-att-title="name_first_line">
-                                                        <t t-out="name_first_line[:50]"/>…
+                                                        <t t-out="name_first_line[:40]"/>…
                                                     </span>
                                                 </t>
                                                 <t t-else="">
@@ -139,17 +139,22 @@
                                                 </t>
                                             </td>
 
-                                            <!-- Quantity (+ packaging) -->
+                                            <!-- Quantity -->
                                             <td name="td_quantity"
                                                 t-attf-class="text-end {{ 'text-nowrap' if (not line.product_packaging_id or len(line.product_packaging_id.name) &lt; 10) else '' }}">
                                                 <span t-field="line.product_uom_qty"/>
                                                 <span t-field="line.product_uom"/>
-                                                <span t-if="line.product_packaging_id">
-                                                    (
-                                                    <span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/>
-                                                    <span t-field="line.product_packaging_id"/>
-                                                    )
-                                                </span>
+                                            </td>
+
+                                            <!-- Qty (dozen/pieces) -->
+                                            <td class="text-end">
+                                                <t t-if="line.set_name">
+                                                    <span t-field="line.set_name"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <!-- keep the cell visually occupied -->
+                                                    <span>&#160;</span>
+                                                </t>
                                             </td>
 
                                             <!-- Unit Price -->
@@ -160,12 +165,6 @@
                                             <!-- Discount (optional column) -->
                                             <td t-if="has_discount_lines" class="text-end">
                                                 <span t-field="line.discount"/>
-                                            </td>
-
-                                            <!-- Taxes -->
-                                            <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_id])"/>
-                                            <td class="text-end">
-                                                <span t-out="taxes or '-'"/>
                                             </td>
 
                                             <!-- Amount (skip for downpayments) -->
@@ -179,9 +178,22 @@
 
                                     <!-- PAGE SUBTOTAL (for this chunk), shown only if not the last page -->
                                     <tr t-if="page['show_subtotal']" class="o_page_subtotal">
-                                        <td t-att-colspan="columns - 1" class="text-end" style="border-top:1px solid #000;">
+                                        <td class="text-start" style="border-top:1px solid #000;">
                                             <strong>Page Subtotal</strong>
                                         </td>
+                                        <!-- Quantity column (empty, just filler) -->
+                                        <td style="border-top:1px solid #000;"> </td>
+
+                                        <td class="text-end" style="border-top:1px solid #000;">
+                                            <!-- Already currency-formatted in Python -->
+                                            <span t-esc="page['qty_display']"/>
+                                        </td>
+                                        <!-- Unit Price column (empty, just filler) -->
+                                        <td style="border-top:1px solid #000;"> </td>
+
+                                        <!-- Discount column (only if exists) -->
+                                        <td t-if="has_discount_lines" style="border-top:1px solid #000;"> </td>
+
                                         <td class="text-end" style="border-top:1px solid #000;">
                                             <!-- Already currency-formatted in Python -->
                                             <span t-esc="page['subtotal_display']"/>
@@ -203,12 +215,22 @@
                                     <table class="o_total_table table table-borderless">
                                         <!-- thin line ABOVE the totals area -->
                                         <tr>
-                                            <td colspan="2" style="border-top: 1px solid #000; height: 1px;"></td>
+                                            <td colspan="3" style="border-top: 1px solid #000; height: 1px;"></td>
                                         </tr>
+
+                                        <!-- sum raw page qtys (include last page because we keep qty_dz/qty_pc everywhere) -->
+                                        <t t-set="grand_dz_raw" t-value="sum([p.get('qty_dz', 0) for p in pages])"/>
+                                        <t t-set="grand_pc_raw" t-value="sum([p.get('qty_pc', 0) for p in pages])"/>
+
+                                        <!-- normalize once: 12 pieces = 1 dozen -->
+                                        <t t-set="grand_dz" t-value="grand_dz_raw + (grand_pc_raw // 12)"/>
+                                        <t t-set="grand_pc" t-value="grand_pc_raw % 12"/>
+                                        <t t-set="grand_qty_label" t-value="str(grand_dz) + ' / ' + str(grand_pc)"/>
 
                                         <!-- Untaxed -->
                                         <tr>
                                             <td>Untaxed Amount</td>
+                                            <td> </td>
                                             <td class="text-end">
                                                 <span t-field="o.amount_untaxed"
                                                       t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
@@ -224,6 +246,7 @@
                                             <td>
                                                 <t t-out="'Tax {:.0f}% on $ {:,.2f}'.format(tax_rate, base_for_tax)"/>
                                             </td>
+                                            <td> </td>
                                             <td class="text-end">
                                                 <span t-out="tax_amt"
                                                       t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
@@ -232,13 +255,16 @@
 
                                         <!-- bold line BEFORE Total (this is the line you want) -->
                                         <tr>
-                                            <td colspan="2" style="border-top: 1px solid #000; height: 2px;"></td>
+                                            <td colspan="3" style="border-top: 1px solid #000; height: 1px;"></td>
                                         </tr>
 
                                         <!-- Total -->
                                         <tr>
                                             <td>
                                                 <strong>Total</strong>
+                                            </td>
+                                            <td class="text-end" style="width: 140px;">
+                                                <strong><t t-out="grand_qty_label"/></strong>
                                             </td>
                                             <td class="text-end">
                                                 <span t-field="o.amount_total"
@@ -298,7 +324,7 @@
     </record>
 
     <record id="action_report_saleorder" model="ir.actions.report">
-        <field name="name">Quotation / Order New</field>
+        <field name="name">Commercial Quotation / Order</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">purchase_commission.report_saleorder_basic</field>
