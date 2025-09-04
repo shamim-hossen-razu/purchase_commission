@@ -23,21 +23,45 @@ class SaleOrder(models.Model):
             return pages
 
         def _chunk_subtotal(chunk):
-            raw = sum(l.price_subtotal for l in chunk)
+            # money subtotal
+            raw = sum((l.price_subtotal or 0.0) for l in chunk)
 
-            return raw, format_amount(self.env, raw, self.currency_id)
+            # collect dozens/pieces from set_name; accept "D / P" or "D"
+            dz, pc = 0, 0
+            for l in chunk:
+                val = (l.set_name or '').strip()
+                if not val:
+                    continue
+                try:
+                    if '/' in val:
+                        left, right = val.split('/', 1)
+                        dz += int((left or '0').strip())
+                        pc += int((right or '0').strip())
+                    else:
+                        dz += int(val)
+                except Exception:
+                    pass
+
+            # ✅ normalize with carry: 12 pieces = 1 dozen (keep remainder)
+            dz += pc // 12
+            pc = pc % 12
+
+            return raw, format_amount(self.env, raw, self.currency_id), dz, pc, f"{dz} / {pc}"
 
         start = 0
         end = min(first_page_count, total_lines)
         first_chunk = printable_lines[start:end]
         if first_chunk:
             more_pages = total_lines > end
-            sub_val, sub_disp = _chunk_subtotal(first_chunk) if more_pages else (0.0, "")
+            sub_val, sub_disp, qdz, qpc, qty_disp = _chunk_subtotal(first_chunk) if more_pages else (0.0, "", 0, 0, "")
             pages.append({
                 'lines': first_chunk,
                 'show_subtotal': more_pages,
                 'subtotal': sub_val,
                 'subtotal_display': sub_disp,
+                'qty_display': qty_disp,
+                'qty_dz': qdz,  # normalized numbers
+                'qty_pc': qpc,
             })
         start = end
 
@@ -48,10 +72,10 @@ class SaleOrder(models.Model):
 
             is_last_page = (start >= total_lines)
             if not is_last_page:
-                sub_val, sub_disp = _chunk_subtotal(chunk)
+                sub_val, sub_disp, qdz, qpc, qty_disp = _chunk_subtotal(chunk)
                 show_subtotal = True
             else:
-                sub_val, sub_disp = (0.0, "")
+                sub_val, sub_disp, qdz, qpc, qty_disp = (0.0, "", 0, 0, "")
                 show_subtotal = False
 
             pages.append({
@@ -59,6 +83,9 @@ class SaleOrder(models.Model):
                 'show_subtotal': show_subtotal,
                 'subtotal': sub_val,
                 'subtotal_display': sub_disp,
+                'qty_display': qty_disp,
+                'qty_dz': qdz,
+                'qty_pc': qpc,
             })
 
         return pages
