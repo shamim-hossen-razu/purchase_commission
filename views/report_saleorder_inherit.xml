@@ -218,11 +218,11 @@
                                             <td colspan="3" style="border-top: 1px solid #000; height: 1px;"></td>
                                         </tr>
 
-                                        <!-- sum numeric page qtys -->
+                                        <!-- sum raw page qtys (include last page because we keep qty_dz/qty_pc everywhere) -->
                                         <t t-set="grand_dz_raw" t-value="sum([p.get('qty_dz', 0) for p in pages])"/>
                                         <t t-set="grand_pc_raw" t-value="sum([p.get('qty_pc', 0) for p in pages])"/>
 
-                                        <!-- ✅ normalize with carry (12 pcs = 1 dz) -->
+                                        <!-- normalize once: 12 pieces = 1 dozen -->
                                         <t t-set="grand_dz" t-value="grand_dz_raw + (grand_pc_raw // 12)"/>
                                         <t t-set="grand_pc" t-value="grand_pc_raw % 12"/>
                                         <t t-set="grand_qty_label" t-value="str(grand_dz) + ' / ' + str(grand_pc)"/>
