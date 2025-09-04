@@ -1,9 +1,15 @@
-from odoo import models, api
+from odoo import models, api, fields
 from odoo.tools.misc import format_amount
 import re
 
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    order_method = fields.Selection([
+        ('onsite', 'On Site'),
+        ('phone_call', 'Phone Call'),
+    ], string='Order Method', default='onsite')
 
     def _report_paginated_lines(self, first_page_count=17, other_page_count=25):
         self.ensure_one()

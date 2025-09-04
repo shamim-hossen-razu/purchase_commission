@@ -27,11 +27,11 @@
     'data': [
         'security/ir.model.access.csv',
         'views/customer_commission_config_views.xml',
-        'views/commission_menu.xml',
         'views/res_partner_views.xml',
         'views/customer_commission_views.xml',
         'views/sale_order_views.xml',
         'views/report_saleorder_inherit.xml',
+        'views/commission_menu.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
