@@ -16,6 +16,9 @@
                     invisible="commission_count==0"/>
                 </button>
             </div>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="related_partner_id" readonly="True"/>
+            </xpath>
         </field>
     </record>
 

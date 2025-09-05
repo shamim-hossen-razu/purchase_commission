@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_purchase_commission" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.purchase.commission</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='general_settings']//div[@id='companies']" position="after">
+                <block title="External Database Configuration" name="db_config">
+                    <setting string="Data Synchronization" help="Set up connection to an external Odoo server to synchronize data."
+                             title="Alternative Database Connection" colspan="4" class="fw-bold"
+                             id="dual_db_sync">
+                        <field name="data_sync"/>
+                        <div class="content-group" invisible="not data_sync" required="data_sync">
+                            <div class="mt8">
+                                <field name="external_server_url" placeholder="External Server URL"/>
+                            </div>
+                            <div class="mt8">
+                                <field name="external_server_db" placeholder="Database Name"/>
+                            </div>
+                            <div class="mt8">
+                                <field name="external_server_uid" placeholder="User ID"/>
+                            </div>
+                            <div class="mt8">
+                                <field name="external_server_password" placeholder="Password" password="1"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

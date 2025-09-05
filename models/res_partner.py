@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import re
+import xmlrpc.client
 
 
 class ResPartner(models.Model):
@@ -8,8 +9,10 @@ class ResPartner(models.Model):
 
     partner_commission_ids = fields.One2many(
         'customer.commission', 'partner_id', string='Customer Commissions')
+    related_partner_id = fields.Integer(string='Related Partner ID')
 
     commission_count = fields.Integer(compute='_compute_commission_count', string='Commission Count')
+    mobile = fields.Char(string='Mobile', help='Mobile number in format +880 XXXX-XXXXXX', required=True)
 
     def _compute_commission_count(self):
         for partner in self:
@@ -43,6 +46,20 @@ class ResPartner(models.Model):
             return '+880 ' + mobile[4:8] + '-' + mobile[8:]
         return mobile
 
+    def _get_external_config(self):
+        ICP = self.env['ir.config_parameter'].sudo()
+        return {
+            'url': ICP.get_param('purchase_commission.external_server_url', ''),
+            'db': ICP.get_param('purchase_commission.external_server_db', ''),
+            'uid': int(ICP.get_param('purchase_commission.external_server_uid', 0)),
+            'password': ICP.get_param('purchase_commission.external_server_password', '')
+        }
+
+    def _db_sync_enabled(self):
+        # if data_sync is true return true else false
+        ICP = self.env['ir.config_parameter'].sudo()
+        return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
+
     @api.model
     def create(self, vals_list):
         """Handle both single and multiple record creation during import"""
@@ -53,9 +70,25 @@ class ResPartner(models.Model):
 
         # Process each record
         for vals in vals_list:
+            # remove key avalara_partner_code and avalara_exemption_id if exists
             if vals.get('mobile'):
                 vals['mobile'] = self._format_mobile_number(vals['mobile'])
+                if self._db_sync_enabled():
+                    config = self._get_external_config()
+                    url = config['url']
+                    db = config['db']
+                    uid = config['uid']
+                    password = config['password']
+                    models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
 
+                    # when same user with name and mobile already available in remote db, do nothing
+                    existing_records = models.execute_kw(db, uid, password, 'res.partner', 'search',
+                            [[['name', '=', vals.get('name')], ['mobile', '=', vals.get('mobile')]]])
+
+                    # If no existing record found, create a new one in the remote DB
+                    if not existing_records:
+                        vals['customer_rank'] = 1
+                        vals['related_partner_id'] = models.execute_kw(db, uid, password, 'res.partner', 'create', [vals])
         # Call super with the processed data
         return super(ResPartner, self).create(vals_list)
 
@@ -63,7 +96,30 @@ class ResPartner(models.Model):
         """Format mobile number during updates"""
         if vals.get('mobile'):
             vals['mobile'] = self._format_mobile_number(vals['mobile'])
+        if self._db_sync_enabled():
+            config = self._get_external_config()
+            url = config['url']
+            db = config['db']
+            uid = config['uid']
+            password = config['password']
+            models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+            # update the related partner in remote db if related_partner_id is set
+            if self.related_partner_id:
+                models.execute_kw(db, uid, password, 'res.partner', 'write', [[self.related_partner_id], vals])
         return super(ResPartner, self).write(vals)
+
+    @api.constrains('mobile', 'name')
+    def _check_unique_customer(self):
+        """Ensure unique combination of name and mobile"""
+        for partner in self:
+            if partner.name and partner.mobile:
+                existing_partners = self.env['res.partner'].search([
+                    ('id', '!=', partner.id),
+                    ('name', '=', partner.name),
+                    ('mobile', '=', partner.mobile)
+                ])
+                if existing_partners:
+                    raise ValidationError("A partner with the same name and mobile number already exists.")
 
     @api.constrains('mobile')
     def _check_mobile_number(self):
@@ -80,3 +136,24 @@ class ResPartner(models.Model):
                 if operator_code not in valid_operators:
                     raise ValidationError(
                         f"Invalid operator code: {operator_code}. Valid codes are: {', '.join(valid_operators)}")
+
+                # check if same mobile number already exists in other partner
+                existing_partners = self.env['res.partner'].search([
+                    ('id', '!=', partner.id),
+                    ('mobile', '=', partner.mobile)
+                ])
+                if existing_partners:
+                    raise ValidationError("A partner with the same mobile number already exists.")
+
+    @api.constrains('email')
+    def _check_email_format(self):
+        """Check if email format is valid and unique"""
+        for partner in self:
+            if partner.email:
+                # Check for duplicate emails
+                existing_partners = self.env['res.partner'].search([
+                    ('id', '!=', partner.id),
+                    ('email', '=', partner.email)
+                ])
+                if existing_partners:
+                    raise ValidationError("A partner with the same email address already exists.")
