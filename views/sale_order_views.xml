@@ -28,5 +28,16 @@
             </field>
         </record>
 
+        <record id="sale_quotation_search_inherit" model="ir.ui.view">
+            <field name="name">sale.quotation.search.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='draft']" position="after">
+                    <filter string="Phone Call Orders" name="phone_call_orders"
+                            domain="[('order_method', '=', 'phone_call'), ('state', '=', 'draft')]"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>
