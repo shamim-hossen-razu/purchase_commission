@@ -1,11 +1,13 @@
 from odoo import fields, models, api
 from odoo.exceptions import ValidationError
 import xmlrpc.client
+from odoo import Command
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     related_product_id = fields.Integer(string="Remote Product ID", help="Stores the product ID of this product in the external database.")
+    related_category_id = fields.Integer(string="Remote Category ID", help="Stores the category ID of this category in the external database.")
 
     def _get_external_config(self):
         """Fetch external server configuration from system parameters"""
@@ -87,3 +89,22 @@ class ProductTemplate(models.Model):
                 existing = self.env['product.template'].search([('id' , '!=', product.id), ('name', '=ilike', product.name)])
                 if existing:
                     raise ValidationError("A product with the same name already exists.")
+
+    def unlink(self):
+        """Override unlink to delete the product.template in external DB as well"""
+        if self._db_sync_enabled():
+            config = self._get_external_config()
+            url = config['url']
+            db = config['db']
+            uid = config['uid']
+            password = config['password']
+            models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+
+            for record in self:
+                if record.related_product_id:
+                    try:
+                        models_rpc.execute_kw(db, uid, password, 'product.template', 'unlink', [[record.related_product_id]])
+                    except Exception as e:
+                        pass
+
+        return super().unlink()

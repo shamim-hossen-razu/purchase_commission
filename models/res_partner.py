@@ -157,3 +157,22 @@ class ResPartner(models.Model):
                 ])
                 if existing_partners:
                     raise ValidationError("A partner with the same email address already exists.")
+
+    def unlink(self):
+        """Override unlink to delete the partner in external DB as well"""
+        if self._db_sync_enabled():
+            config = self._get_external_config()
+            url = config['url']
+            db = config['db']
+            uid = config['uid']
+            password = config['password']
+            models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+
+            for partner in self:
+                if partner.related_partner_id:
+                    try:
+                        models_rpc.execute_kw(db, uid, password, 'res.partner', 'unlink', [[partner.related_partner_id]])
+                    except Exception:
+                        pass
+
+        return super().unlink()
