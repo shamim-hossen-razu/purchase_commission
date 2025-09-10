@@ -1,0 +1,495 @@
+id,upazila_id,district_id:id,name,bn_name,url
+upazila_id_1,1,district_id_1,Debidwar,দেবিদ্বার,debidwar.comilla.gov.bd
+upazila_id_2,2,district_id_1,Barura,বরুড়া,barura.comilla.gov.bd
+upazila_id_3,3,district_id_1,Brahmanpara,ব্রাহ্মণপাড়া,brahmanpara.comilla.gov.bd
+upazila_id_4,4,district_id_1,Chandina,চান্দিনা,chandina.comilla.gov.bd
+upazila_id_5,5,district_id_1,Chauddagram,চৌদ্দগ্রাম,chauddagram.comilla.gov.bd
+upazila_id_6,6,district_id_1,Daudkandi,দাউদকান্দি,daudkandi.comilla.gov.bd
+upazila_id_7,7,district_id_1,Homna,হোমনা,homna.comilla.gov.bd
+upazila_id_8,8,district_id_1,Laksam,লাকসাম,laksam.comilla.gov.bd
+upazila_id_9,9,district_id_1,Muradnagar,মুরাদনগর,muradnagar.comilla.gov.bd
+upazila_id_10,10,district_id_1,Nangalkot,নাঙ্গলকোট,nangalkot.comilla.gov.bd
+upazila_id_11,11,district_id_1,Comilla Sadar,কুমিল্লা সদর,comillasadar.comilla.gov.bd
+upazila_id_12,12,district_id_1,Meghna,মেঘনা,meghna.comilla.gov.bd
+upazila_id_13,13,district_id_1,Monohargonj,মনোহরগঞ্জ,monohargonj.comilla.gov.bd
+upazila_id_14,14,district_id_1,Sadarsouth,সদর দক্ষিণ,sadarsouth.comilla.gov.bd
+upazila_id_15,15,district_id_1,Titas,তিতাস,titas.comilla.gov.bd
+upazila_id_16,16,district_id_1,Burichang,বুড়িচং,burichang.comilla.gov.bd
+upazila_id_17,17,district_id_1,Lalmai,লালমাই,lalmai.comilla.gov.bd
+upazila_id_18,18,district_id_2,Chhagalnaiya,ছাগলনাইয়া,chhagalnaiya.feni.gov.bd
+upazila_id_19,19,district_id_2,Feni Sadar,ফেনী সদর,sadar.feni.gov.bd
+upazila_id_20,20,district_id_2,Sonagazi,সোনাগাজী,sonagazi.feni.gov.bd
+upazila_id_21,21,district_id_2,Fulgazi,ফুলগাজী,fulgazi.feni.gov.bd
+upazila_id_22,22,district_id_2,Parshuram,পরশুরাম,parshuram.feni.gov.bd
+upazila_id_23,23,district_id_2,Daganbhuiyan,দাগনভূঞা,daganbhuiyan.feni.gov.bd
+upazila_id_24,24,district_id_3,Brahmanbaria Sadar,ব্রাহ্মণবাড়িয়া সদর,sadar.brahmanbaria.gov.bd
+upazila_id_25,25,district_id_3,Kasba,কসবা,kasba.brahmanbaria.gov.bd
+upazila_id_26,26,district_id_3,Nasirnagar,নাসিরনগর,nasirnagar.brahmanbaria.gov.bd
+upazila_id_27,27,district_id_3,Sarail,সরাইল,sarail.brahmanbaria.gov.bd
+upazila_id_28,28,district_id_3,Ashuganj,আশুগঞ্জ,ashuganj.brahmanbaria.gov.bd
+upazila_id_29,29,district_id_3,Akhaura,আখাউড়া,akhaura.brahmanbaria.gov.bd
+upazila_id_30,30,district_id_3,Nabinagar,নবীনগর,nabinagar.brahmanbaria.gov.bd
+upazila_id_31,31,district_id_3,Bancharampur,বাঞ্ছারামপুর,bancharampur.brahmanbaria.gov.bd
+upazila_id_32,32,district_id_3,Bijoynagar,বিজয়নগর,bijoynagar.brahmanbaria.gov.bd    
+upazila_id_33,33,district_id_4,Rangamati Sadar,রাঙ্গামাটি সদর,sadar.rangamati.gov.bd
+upazila_id_34,34,district_id_4,Kaptai,কাপ্তাই,kaptai.rangamati.gov.bd
+upazila_id_35,35,district_id_4,Kawkhali,কাউখালী,kawkhali.rangamati.gov.bd
+upazila_id_36,36,district_id_4,Baghaichari,বাঘাইছড়ি,baghaichari.rangamati.gov.bd
+upazila_id_37,37,district_id_4,Barkal,বরকল,barkal.rangamati.gov.bd
+upazila_id_38,38,district_id_4,Langadu,লংগদু,langadu.rangamati.gov.bd
+upazila_id_39,39,district_id_4,Rajasthali,রাজস্থলী,rajasthali.rangamati.gov.bd
+upazila_id_40,40,district_id_4,Belaichari,বিলাইছড়ি,belaichari.rangamati.gov.bd
+upazila_id_41,41,district_id_4,Juraichari,জুরাছড়ি,juraichari.rangamati.gov.bd
+upazila_id_42,42,district_id_4,Naniarchar,নানিয়ারচর,naniarchar.rangamati.gov.bd
+upazila_id_43,43,district_id_5,Noakhali Sadar,নোয়াখালী সদর,sadar.noakhali.gov.bd
+upazila_id_44,44,district_id_5,Companiganj,কোম্পানীগঞ্জ,companiganj.noakhali.gov.bd
+upazila_id_45,45,district_id_5,Begumganj,বেগমগঞ্জ,begumganj.noakhali.gov.bd
+upazila_id_46,46,district_id_5,Hatia,হাতিয়া,hatia.noakhali.gov.bd
+upazila_id_47,47,district_id_5,Subarnachar,সুবর্ণচর,subarnachar.noakhali.gov.bd
+upazila_id_48,48,district_id_5,Kabirhat,কবিরহাট,kabirhat.noakhali.gov.bd
+upazila_id_49,49,district_id_5,Senbug,সেনবাগ,senbug.noakhali.gov.bd
+upazila_id_50,50,district_id_5,Chatkhil,চাটখিল,chatkhil.noakhali.gov.bd
+upazila_id_51,51,district_id_5,Sonaimori,সোনাইমুড়ী,sonaimori.noakhali.gov.bd
+upazila_id_52,52,district_id_6,Haimchar,হাইমচর,haimchar.chandpur.gov.bd
+upazila_id_53,53,district_id_6,Kachua,কচুয়া,kachua.chandpur.gov.bd
+upazila_id_54,54,district_id_6,Shahrasti,শাহরাস্তি,shahrasti.chandpur.gov.bd
+upazila_id_55,55,district_id_6,Chandpur Sadar,চাঁদপুর সদর,sadar.chandpur.gov.bd
+upazila_id_56,56,district_id_6,Matlab South,মতলব দক্ষিণ,matlabsouth.chandpur.gov.bd
+upazila_id_57,57,district_id_6,Hajiganj,হাজীগঞ্জ,hajiganj.chandpur.gov.bd
+upazila_id_58,58,district_id_6,Matlab North,মতলব উত্তর,matlabnorth.chandpur.gov.bd
+upazila_id_59,59,district_id_6,Faridgonj,ফরিদগঞ্জ,faridgonj.chandpur.gov.bd
+upazila_id_60,60,district_id_7,Lakshmipur Sadar,লক্ষ্মীপুর সদর,sadar.lakshmipur.gov.bd
+upazila_id_61,61,district_id_7,Kamalnagar,কমলনগর,kamalnagar.lakshmipur.gov.bd
+upazila_id_62,62,district_id_7,Raipur,রায়পুর,raipur.lakshmipur.gov.bd
+upazila_id_63,63,district_id_7,Ramgati,রামগতি,ramgati.lakshmipur.gov.bd
+upazila_id_64,64,district_id_7,Ramganj,রামগঞ্জ,ramganj.lakshmipur.gov.bd
+upazila_id_65,65,district_id_8,Rangunia,রাঙ্গুনিয়া,rangunia.chittagong.gov.bd
+upazila_id_66,66,district_id_8,Sitakunda,সীতাকুন্ড,sitakunda.chittagong.gov.bd
+upazila_id_67,67,district_id_8,Mirsharai,মীরসরাই,mirsharai.chittagong.gov.bd
+upazila_id_68,68,district_id_8,Patiya,পটিয়া,patiya.chittagong.gov.bd
+upazila_id_69,69,district_id_8,Sandwip,সন্দ্বীপ,sandwip.chittagong.gov.bd
+upazila_id_70,70,district_id_8,Banshkhali,বাঁশখালী,banshkhali.chittagong.gov.bd
+upazila_id_71,71,district_id_8,Boalkhali,বোয়ালখালী,boalkhali.chittagong.gov.bd
+upazila_id_72,72,district_id_8,Anwara,আনোয়ারা,anwara.chittagong.gov.bd
+upazila_id_73,73,district_id_8,Chandanaish,চন্দনাইশ,chandanaish.chittagong.gov.bd
+upazila_id_74,74,district_id_8,Satkania,সাতকানিয়া,satkania.chittagong.gov.bd
+upazila_id_75,75,district_id_8,Lohagara,লোহাগাড়া,lohagara.chittagong.gov.bd
+upazila_id_76,76,district_id_8,Hathazari,হাটহাজারী,hathazari.chittagong.gov.bd
+upazila_id_77,77,district_id_8,Fatikchhari,ফটিকছড়ি,fatikchhari.chittagong.gov.bd
+upazila_id_78,78,district_id_8,Raozan,রাউজান,raozan.chittagong.gov.bd
+upazila_id_79,79,district_id_8,Karnafuli,কর্ণফুলী,karnafuli.chittagong.gov.bd
+upazila_id_80,80,district_id_9,Coxsbazar Sadar,কক্সবাজার সদর,sadar.coxsbazar.gov.bd
+upazila_id_81,81,district_id_9,Chakaria,চকরিয়া,chakaria.coxsbazar.gov.bd
+upazila_id_82,82,district_id_9,Kutubdia,কুতুবদিয়া,kutubdia.coxsbazar.gov.bd
+upazila_id_83,83,district_id_9,Ukhiya,উখিয়া,ukhiya.coxsbazar.gov.bd
+upazila_id_84,84,district_id_9,Moheshkhali,মহেশখালী,moheshkhali.coxsbazar.gov.bd
+upazila_id_85,85,district_id_9,Pekua,পেকুয়া,pekua.coxsbazar.gov.bd
+upazila_id_86,86,district_id_9,Ramu,রামু,ramu.coxsbazar.gov.bd
+upazila_id_87,87,district_id_9,Teknaf,টেকনাফ,teknaf.coxsbazar.gov.bd
+upazila_id_88,88,district_id_10,Khagrachhari Sadar,খাগড়াছড়ি সদর,sadar.khagrachhari.gov.bd
+upazila_id_89,89,district_id_10,Dighinala,দিঘীনালা,dighinala.khagrachhari.gov.bd
+upazila_id_90,90,district_id_10,Panchari,পানছড়ি,panchari.khagrachhari.gov.bd
+upazila_id_91,91,district_id_10,Laxmichhari,লক্ষীছড়ি,laxmichhari.khagrachhari.gov.bd
+upazila_id_92,92,district_id_10,Mohalchari,মহালছড়ি,mohalchari.khagrachhari.gov.bd
+upazila_id_93,93,district_id_10,Manikchari,মানিকছড়ি,manikchari.khagrachhari.gov.bd
+upazila_id_94,94,district_id_10,Ramgarh,রামগড়,ramgarh.khagrachhari.gov.bd
+upazila_id_95,95,district_id_10,Matiranga,মাটিরাঙ্গা,matiranga.khagrachhari.gov.bd
+upazila_id_96,96,district_id_10,Guimara,গুইমারা,guimara.khagrachhari.gov.bd
+upazila_id_97,97,district_id_11,Bandarban Sadar,বান্দরবান সদর,sadar.bandarban.gov.bd
+upazila_id_98,98,district_id_11,Alikadam,আলীকদম,alikadam.bandarban.gov.bd
+upazila_id_99,99,district_id_11,Naikhongchhari,নাইক্ষ্যংছড়ি,naikhongchhari.bandarban.gov.bd
+upazila_id_100,100,district_id_11,Rowangchhari,রোয়াংছড়ি,rowangchhari.bandarban.gov.bd
+upazila_id_101,101,district_id_11,Lama,লামা,lama.bandarban.gov.bd
+upazila_id_102,102,district_id_11,Ruma,রুমা,ruma.bandarban.gov.bd
+upazila_id_103,103,district_id_11,Thanchi,থানচি,thanchi.bandarban.gov.bd
+upazila_id_104,104,district_id_12,Belkuchi,বেলকুচি,belkuchi.sirajganj.gov.bd
+upazila_id_105,105,district_id_12,Chauhali,চৌহালি,chauhali.sirajganj.gov.bd
+upazila_id_106,106,district_id_12,Kamarkhand,কামারখন্দ,kamarkhand.sirajganj.gov.bd
+upazila_id_107,107,district_id_12,Kazipur,কাজীপুর,kazipur.sirajganj.gov.bd
+upazila_id_108,108,district_id_12,Raigonj,রায়গঞ্জ,raigonj.sirajganj.gov.bd
+upazila_id_109,109,district_id_12,Shahjadpur,শাহজাদপুর,shahjadpur.sirajganj.gov.bd
+upazila_id_110,110,district_id_12,Sirajganj Sadar,সিরাজগঞ্জ সদর,sirajganjsadar.sirajganj.gov.bd
+upazila_id_111,111,district_id_12,Tarash,তাড়াশ,tarash.sirajganj.gov.bd
+upazila_id_112,112,district_id_12,Ullapara,উল্লাপাড়া,ullapara.sirajganj.gov.bd
+upazila_id_113,113,district_id_13,Sujanagar,সুজানগর,sujanagar.pabna.gov.bd
+upazila_id_114,114,district_id_13,Ishurdi,ঈশ্বরদী,ishurdi.pabna.gov.bd
+upazila_id_115,115,district_id_13,Bhangura,ভাঙ্গুড়া,bhangura.pabna.gov.bd
+upazila_id_116,116,district_id_13,Pabna Sadar,পাবনা সদর,pabnasadar.pabna.gov.bd
+upazila_id_117,117,district_id_13,Bera,বেড়া,bera.pabna.gov.bd
+upazila_id_118,118,district_id_13,Atghoria,আটঘরিয়া,atghoria.pabna.gov.bd
+upazila_id_119,119,district_id_13,Chatmohar,চাটমোহর,chatmohar.pabna.gov.bd
+upazila_id_120,120,district_id_13,Santhia,সাঁথিয়া,santhia.pabna.gov.bd
+upazila_id_121,121,district_id_13,Faridpur,ফরিদপুর,faridpur.pabna.gov.bd
+upazila_id_122,122,district_id_14,Kahaloo,কাহালু,kahaloo.bogra.gov.bd
+upazila_id_123,123,district_id_14,Bogra Sadar,বগুড়া সদর,sadar.bogra.gov.bd
+upazila_id_124,124,district_id_14,Shariakandi,সারিয়াকান্দি,shariakandi.bogra.gov.bd
+upazila_id_125,125,district_id_14,Shajahanpur,শাজাহানপুর,shajahanpur.bogra.gov.bd
+upazila_id_126,126,district_id_14,Dupchanchia,দুপচাচিঁয়া,dupchanchia.bogra.gov.bd
+upazila_id_127,127,district_id_14,Adamdighi,আদমদিঘি,adamdighi.bogra.gov.bd
+upazila_id_128,128,district_id_14,Nondigram,নন্দিগ্রাম,nondigram.bogra.gov.bd
+upazila_id_129,129,district_id_14,Sonatala,সোনাতলা,sonatala.bogra.gov.bd
+upazila_id_130,130,district_id_14,Dhunot,ধুনট,dhunot.bogra.gov.bd
+upazila_id_131,131,district_id_14,Gabtali,গাবতলী,gabtali.bogra.gov.bd
+upazila_id_132,132,district_id_14,Sherpur,শেরপুর,sherpur.bogra.gov.bd
+upazila_id_133,133,district_id_14,Shibganj,শিবগঞ্জ,shibganj.bogra.gov.bd
+upazila_id_134,134,district_id_15,Paba,পবা,paba.rajshahi.gov.bd
+upazila_id_135,135,district_id_15,Durgapur,দুর্গাপুর,durgapur.rajshahi.gov.bd
+upazila_id_136,136,district_id_15,Mohonpur,মোহনপুর,mohonpur.rajshahi.gov.bd
+upazila_id_137,137,district_id_15,Charghat,চারঘাট,charghat.rajshahi.gov.bd
+upazila_id_138,138,district_id_15,Puthia,পুঠিয়া,puthia.rajshahi.gov.bd
+upazila_id_139,139,district_id_15,Bagha,বাঘা,bagha.rajshahi.gov.bd
+upazila_id_140,140,district_id_15,Godagari,গোদাগাড়ী,godagari.rajshahi.gov.bd
+upazila_id_141,141,district_id_15,Tanore,তানোর,tanore.rajshahi.gov.bd
+upazila_id_142,142,district_id_15,Bagmara,বাগমারা,bagmara.rajshahi.gov.bd
+upazila_id_143,143,district_id_16,Natore Sadar,নাটোর সদর,natoresadar.natore.gov.bd
+upazila_id_144,144,district_id_16,Singra,সিংড়া,singra.natore.gov.bd
+upazila_id_145,145,district_id_16,Baraigram,বড়াইগ্রাম,baraigram.natore.gov.bd
+upazila_id_146,146,district_id_16,Bagatipara,বাগাতিপাড়া,bagatipara.natore.gov.bd
+upazila_id_147,147,district_id_16,Lalpur,লালপুর,lalpur.natore.gov.bd
+upazila_id_148,148,district_id_16,Gurudaspur,গুরুদাসপুর,gurudaspur.natore.gov.bd
+upazila_id_149,149,district_id_16,Naldanga,নলডাঙ্গা,naldanga.natore.gov.bd
+upazila_id_150,150,district_id_17,Akkelpur,আক্কেলপুর,akkelpur.joypurhat.gov.bd
+upazila_id_151,151,district_id_17,Kalai,কালাই,kalai.joypurhat.gov.bd
+upazila_id_152,152,district_id_17,Khetlal,ক্ষেতলাল,khetlal.joypurhat.gov.bd
+upazila_id_153,153,district_id_17,Panchbibi,পাঁচবিবি,panchbibi.joypurhat.gov.bd
+upazila_id_154,154,district_id_17,Joypurhat Sadar,জয়পুরহাট সদর,joypurhatsadar.joypurhat.gov.bd
+upazila_id_155,155,district_id_18,Chapainawabganj Sadar,চাঁপাইনবাবগঞ্জ সদর,chapainawabganjsadar.chapainawabganj.gov.bd
+upazila_id_156,156,district_id_18,Gomostapur,গোমস্তাপুর,gomostapur.chapainawabganj.gov.bd
+upazila_id_157,157,district_id_18,Nachol,নাচোল,nachol.chapainawabganj.gov.bd
+upazila_id_158,158,district_id_18,Bholahat,ভোলাহাট,bholahat.chapainawabganj.gov.bd
+upazila_id_159,159,district_id_18,Shibganj,শিবগঞ্জ,shibganj.chapainawabganj.gov.bd
+upazila_id_160,160,district_id_19,Mohadevpur,মহাদেবপুর,mohadevpur.naogaon.gov.bd
+upazila_id_161,161,district_id_19,Badalgachi,বদলগাছী,badalgachi.naogaon.gov.bd
+upazila_id_162,162,district_id_19,Patnitala,পত্নিতলা,patnitala.naogaon.gov.bd
+upazila_id_163,163,district_id_19,Dhamoirhat,ধামইরহাট,dhamoirhat.naogaon.gov.bd
+upazila_id_164,164,district_id_19,Niamatpur,নিয়ামতপুর,niamatpur.naogaon.gov.bd
+upazila_id_165,165,district_id_19,Manda,মান্দা,manda.naogaon.gov.bd
+upazila_id_166,166,district_id_19,Atrai,আত্রাই,atrai.naogaon.gov.bd
+upazila_id_167,167,district_id_19,Raninagar,রাণীনগর,raninagar.naogaon.gov.bd
+upazila_id_168,168,district_id_19,Naogaon Sadar,নওগাঁ সদর,naogaonsadar.naogaon.gov.bd
+upazila_id_169,169,district_id_19,Porsha,পোরশা,porsha.naogaon.gov.bd
+upazila_id_170,170,district_id_19,Sapahar,সাপাহার,sapahar.naogaon.gov.bd
+upazila_id_171,171,district_id_20,Manirampur,মণিরামপুর,manirampur.jessore.gov.bd
+upazila_id_172,172,district_id_20,Abhaynagar,অভয়নগর,abhaynagar.jessore.gov.bd
+upazila_id_173,173,district_id_20,Bagherpara,বাঘারপাড়া,bagherpara.jessore.gov.bd
+upazila_id_174,174,district_id_20,Chougachha,চৌগাছা,chougachha.jessore.gov.bd
+upazila_id_175,175,district_id_20,Jhikargacha,ঝিকরগাছা,jhikargacha.jessore.gov.bd
+upazila_id_176,176,district_id_20,Keshabpur,কেশবপুর,keshabpur.jessore.gov.bd
+upazila_id_177,177,district_id_20,Jessore Sadar,যশোর সদর,sadar.jessore.gov.bd
+upazila_id_178,178,district_id_20,Sharsha,শার্শা,sharsha.jessore.gov.bd
+upazila_id_179,179,district_id_21,Assasuni,আশাশুনি,assasuni.satkhira.gov.bd
+upazila_id_180,180,district_id_21,Debhata,দেবহাটা,debhata.satkhira.gov.bd
+upazila_id_181,181,district_id_21,Kalaroa,কলারোয়া,kalaroa.satkhira.gov.bd
+upazila_id_182,182,district_id_21,Satkhira Sadar,সাতক্ষীরা সদর,satkhirasadar.satkhira.gov.bd
+upazila_id_183,183,district_id_21,Shyamnagar,শ্যামনগর,shyamnagar.satkhira.gov.bd
+upazila_id_184,184,district_id_21,Tala,তালা,tala.satkhira.gov.bd
+upazila_id_185,185,district_id_21,Kaliganj,কালিগঞ্জ,kaliganj.satkhira.gov.bd
+upazila_id_186,186,district_id_22,Mujibnagar,মুজিবনগর,mujibnagar.meherpur.gov.bd
+upazila_id_187,187,district_id_22,Meherpur Sadar,মেহেরপুর সদর,meherpursadar.meherpur.gov.bd
+upazila_id_188,188,district_id_22,Gangni,গাংনী,gangni.meherpur.gov.bd
+upazila_id_189,189,district_id_23,Narail Sadar,নড়াইল সদর,narailsadar.narail.gov.bd
+upazila_id_190,190,district_id_23,Lohagara,লোহাগড়া,lohagara.narail.gov.bd
+upazila_id_191,191,district_id_23,Kalia,কালিয়া,kalia.narail.gov.bd
+upazila_id_192,192,district_id_24,Chuadanga Sadar,চুয়াডাঙ্গা সদর,chuadangasadar.chuadanga.gov.bd
+upazila_id_193,193,district_id_24,Alamdanga,আলমডাঙ্গা,alamdanga.chuadanga.gov.bd
+upazila_id_194,194,district_id_24,Damurhuda,দামুড়হুদা,damurhuda.chuadanga.gov.bd
+upazila_id_195,195,district_id_24,Jibannagar,জীবননগর,jibannagar.chuadanga.gov.bd
+upazila_id_196,196,district_id_25,Kushtia Sadar,কুষ্টিয়া সদর,kushtiasadar.kushtia.gov.bd
+upazila_id_197,197,district_id_25,Kumarkhali,কুমারখালী,kumarkhali.kushtia.gov.bd
+upazila_id_198,198,district_id_25,Khoksa,খোকসা,khoksa.kushtia.gov.bd
+upazila_id_199,199,district_id_25,Mirpur,মিরপুর,mirpurkushtia.kushtia.gov.bd
+upazila_id_200,200,district_id_25,Daulatpur,দৌলতপুর,daulatpur.kushtia.gov.bd
+upazila_id_201,201,district_id_25,Bheramara,ভেড়ামারা,bheramara.kushtia.gov.bd
+upazila_id_202,202,district_id_26,Shalikha,শালিখা,shalikha.magura.gov.bd
+upazila_id_203,203,district_id_26,Sreepur,শ্রীপুর,sreepur.magura.gov.bd
+upazila_id_204,204,district_id_26,Magura Sadar,মাগুরা সদর,magurasadar.magura.gov.bd
+upazila_id_205,205,district_id_26,Mohammadpur,মহম্মদপুর,mohammadpur.magura.gov.bd
+upazila_id_206,206,district_id_27,Paikgasa,পাইকগাছা,paikgasa.khulna.gov.bd
+upazila_id_207,207,district_id_27,Fultola,ফুলতলা,fultola.khulna.gov.bd
+upazila_id_208,208,district_id_27,Digholia,দিঘলিয়া,digholia.khulna.gov.bd
+upazila_id_209,209,district_id_27,Rupsha,রূপসা,rupsha.khulna.gov.bd
+upazila_id_210,210,district_id_27,Terokhada,তেরখাদা,terokhada.khulna.gov.bd
+upazila_id_211,211,district_id_27,Dumuria,ডুমুরিয়া,dumuria.khulna.gov.bd
+upazila_id_212,212,district_id_27,Botiaghata,বটিয়াঘাটা,botiaghata.khulna.gov.bd
+upazila_id_213,213,district_id_27,Dakop,দাকোপ,dakop.khulna.gov.bd
+upazila_id_214,214,district_id_27,Koyra,কয়রা,koyra.khulna.gov.bd
+upazila_id_215,215,district_id_28,Fakirhat,ফকিরহাট,fakirhat.bagerhat.gov.bd
+upazila_id_216,216,district_id_28,Bagerhat Sadar,বাগেরহাট সদর,sadar.bagerhat.gov.bd
+upazila_id_217,217,district_id_28,Mollahat,মোল্লাহাট,mollahat.bagerhat.gov.bd
+upazila_id_218,218,district_id_28,Sarankhola,শরণখোলা,sarankhola.bagerhat.gov.bd
+upazila_id_219,219,district_id_28,Rampal,রামপাল,rampal.bagerhat.gov.bd
+upazila_id_220,220,district_id_28,Morrelganj,মোড়েলগঞ্জ,morrelganj.bagerhat.gov.bd
+upazila_id_221,221,district_id_28,Kachua,কচুয়া,kachua.bagerhat.gov.bd
+upazila_id_222,222,district_id_28,Mongla,মোংলা,mongla.bagerhat.gov.bd
+upazila_id_223,223,district_id_28,Chitalmari,চিতলমারী,chitalmari.bagerhat.gov.bd
+upazila_id_224,224,district_id_29,Jhenaidah Sadar,ঝিনাইদহ সদর,sadar.jhenaidah.gov.bd
+upazila_id_225,225,district_id_29,Shailkupa,শৈলকুপা,shailkupa.jhenaidah.gov.bd
+upazila_id_226,226,district_id_29,Harinakundu,হরিণাকুন্ডু,harinakundu.jhenaidah.gov.bd
+upazila_id_227,227,district_id_29,Kaliganj,কালীগঞ্জ,kaliganj.jhenaidah.gov.bd
+upazila_id_228,228,district_id_29,Kotchandpur,কোটচাঁদপুর,kotchandpur.jhenaidah.gov.bd
+upazila_id_229,229,district_id_29,Moheshpur,মহেশপুর,moheshpur.jhenaidah.gov.bd
+upazila_id_230,230,district_id_30,Jhalakathi Sadar,ঝালকাঠি সদর,sadar.jhalakathi.gov.bd
+upazila_id_231,231,district_id_30,Kathalia,কাঠালিয়া,kathalia.jhalakathi.gov.bd
+upazila_id_232,232,district_id_30,Nalchity,নলছিটি,nalchity.jhalakathi.gov.bd
+upazila_id_233,233,district_id_30,Rajapur,রাজাপুর,rajapur.jhalakathi.gov.bd
+upazila_id_234,234,district_id_31,Bauphal,বাউফল,bauphal.patuakhali.gov.bd
+upazila_id_235,235,district_id_31,Patuakhali Sadar,পটুয়াখালী সদর,sadar.patuakhali.gov.bd
+upazila_id_236,236,district_id_31,Dumki,দুমকি,dumki.patuakhali.gov.bd
+upazila_id_237,237,district_id_31,Dashmina,দশমিনা,dashmina.patuakhali.gov.bd
+upazila_id_238,238,district_id_31,Kalapara,কলাপাড়া,kalapara.patuakhali.gov.bd
+upazila_id_239,239,district_id_31,Mirzaganj,মির্জাগঞ্জ,mirzaganj.patuakhali.gov.bd
+upazila_id_240,240,district_id_31,Galachipa,গলাচিপা,galachipa.patuakhali.gov.bd
+upazila_id_241,241,district_id_31,Rangabali,রাঙ্গাবালী,rangabali.patuakhali.gov.bd
+upazila_id_242,242,district_id_32,Pirojpur Sadar,পিরোজপুর সদর,sadar.pirojpur.gov.bd
+upazila_id_243,243,district_id_32,Nazirpur,নাজিরপুর,nazirpur.pirojpur.gov.bd
+upazila_id_244,244,district_id_32,Kawkhali,কাউখালী,kawkhali.pirojpur.gov.bd
+upazila_id_245,245,district_id_32,Zianagar,জিয়ানগর,zianagar.pirojpur.gov.bd
+upazila_id_246,246,district_id_32,Bhandaria,ভান্ডারিয়া,bhandaria.pirojpur.gov.bd
+upazila_id_247,247,district_id_32,Mathbaria,মঠবাড়ীয়া,mathbaria.pirojpur.gov.bd
+upazila_id_248,248,district_id_32,Nesarabad,নেছারাবাদ,nesarabad.pirojpur.gov.bd
+upazila_id_249,249,district_id_33,Barisal Sadar,বরিশাল সদর,barisalsadar.barisal.gov.bd
+upazila_id_250,250,district_id_33,Bakerganj,বাকেরগঞ্জ,bakerganj.barisal.gov.bd
+upazila_id_251,251,district_id_33,Babuganj,বাবুগঞ্জ,babuganj.barisal.gov.bd
+upazila_id_252,252,district_id_33,Wazirpur,উজিরপুর,wazirpur.barisal.gov.bd
+upazila_id_253,253,district_id_33,Banaripara,বানারীপাড়া,banaripara.barisal.gov.bd
+upazila_id_254,254,district_id_33,Gournadi,গৌরনদী,gournadi.barisal.gov.bd
+upazila_id_255,255,district_id_33,Agailjhara,আগৈলঝাড়া,agailjhara.barisal.gov.bd
+upazila_id_256,256,district_id_33,Mehendiganj,মেহেন্দিগঞ্জ,mehendiganj.barisal.gov.bd
+upazila_id_257,257,district_id_33,Muladi,মুলাদী,muladi.barisal.gov.bd
+upazila_id_258,258,district_id_33,Hizla,হিজলা,hizla.barisal.gov.bd
+upazila_id_259,259,district_id_34,Bhola Sadar,ভোলা সদর,sadar.bhola.gov.bd
+upazila_id_260,260,district_id_34,Borhan Sddin,বোরহান উদ্দিন,borhanuddin.bhola.gov.bd
+upazila_id_261,261,district_id_34,Charfesson,চরফ্যাশন,charfesson.bhola.gov.bd
+upazila_id_262,262,district_id_34,Doulatkhan,দৌলতখান,doulatkhan.bhola.gov.bd
+upazila_id_263,263,district_id_34,Monpura,মনপুরা,monpura.bhola.gov.bd
+upazila_id_264,264,district_id_34,Tazumuddin,তজুমদ্দিন,tazumuddin.bhola.gov.bd
+upazila_id_265,265,district_id_34,Lalmohan,লালমোহন,lalmohan.bhola.gov.bd
+upazila_id_266,266,district_id_35,Amtali,আমতলী,amtali.barguna.gov.bd
+upazila_id_267,267,district_id_35,Barguna Sadar,বরগুনা সদর,sadar.barguna.gov.bd
+upazila_id_268,268,district_id_35,Betagi,বেতাগী,betagi.barguna.gov.bd
+upazila_id_269,269,district_id_35,Bamna,বামনা,bamna.barguna.gov.bd
+upazila_id_270,270,district_id_35,Pathorghata,পাথরঘাটা,pathorghata.barguna.gov.bd
+upazila_id_271,271,district_id_35,Taltali,তালতলি,taltali.barguna.gov.bd
+upazila_id_272,272,district_id_36,Balaganj,বালাগঞ্জ,balaganj.sylhet.gov.bd
+upazila_id_273,273,district_id_36,Beanibazar,বিয়ানীবাজার,beanibazar.sylhet.gov.bd
+upazila_id_274,274,district_id_36,Bishwanath,বিশ্বনাথ,bishwanath.sylhet.gov.bd
+upazila_id_275,275,district_id_36,Companiganj,কোম্পানীগঞ্জ,companiganj.sylhet.gov.bd
+upazila_id_276,276,district_id_36,Fenchuganj,ফেঞ্চুগঞ্জ,fenchuganj.sylhet.gov.bd
+upazila_id_277,277,district_id_36,Golapganj,গোলাপগঞ্জ,golapganj.sylhet.gov.bd
+upazila_id_278,278,district_id_36,Gowainghat,গোয়াইনঘাট,gowainghat.sylhet.gov.bd
+upazila_id_279,279,district_id_36,Jaintiapur,জৈন্তাপুর,jaintiapur.sylhet.gov.bd
+upazila_id_280,280,district_id_36,Kanaighat,কানাইঘাট,kanaighat.sylhet.gov.bd
+upazila_id_281,281,district_id_36,Sylhet Sadar,সিলেট সদর,sylhetsadar.sylhet.gov.bd
+upazila_id_282,282,district_id_36,Zakiganj,জকিগঞ্জ,zakiganj.sylhet.gov.bd
+upazila_id_283,283,district_id_36,Dakshinsurma,দক্ষিণ সুরমা,dakshinsurma.sylhet.gov.bd
+upazila_id_284,284,district_id_36,Osmaninagar,ওসমানী নগর,osmaninagar.sylhet.gov.bd
+upazila_id_285,285,district_id_37,Barlekha,বড়লেখা,barlekha.moulvibazar.gov.bd
+upazila_id_286,286,district_id_37,Kamolganj,কমলগঞ্জ,kamolganj.moulvibazar.gov.bd
+upazila_id_287,287,district_id_37,Kulaura,কুলাউড়া,kulaura.moulvibazar.gov.bd
+upazila_id_288,288,district_id_37,Moulvibazar Sadar,মৌলভীবাজার সদর,moulvibazarsadar.moulvibazar.gov.bd
+upazila_id_289,289,district_id_37,Rajnagar,রাজনগর,rajnagar.moulvibazar.gov.bd
+upazila_id_290,290,district_id_37,Sreemangal,শ্রীমঙ্গল,sreemangal.moulvibazar.gov.bd
+upazila_id_291,291,district_id_37,Juri,জুড়ী,juri.moulvibazar.gov.bd
+upazila_id_292,292,district_id_38,Nabiganj,নবীগঞ্জ,nabiganj.habiganj.gov.bd
+upazila_id_293,293,district_id_38,Bahubal,বাহুবল,bahubal.habiganj.gov.bd
+upazila_id_294,294,district_id_38,Ajmiriganj,আজমিরীগঞ্জ,ajmiriganj.habiganj.gov.bd
+upazila_id_295,295,district_id_38,Baniachong,বানিয়াচং,baniachong.habiganj.gov.bd
+upazila_id_296,296,district_id_38,Lakhai,লাখাই,lakhai.habiganj.gov.bd
+upazila_id_297,297,district_id_38,Chunarughat,চুনারুঘাট,chunarughat.habiganj.gov.bd
+upazila_id_298,298,district_id_38,Habiganj Sadar,হবিগঞ্জ সদর,habiganjsadar.habiganj.gov.bd
+upazila_id_299,299,district_id_38,Madhabpur,মাধবপুর,madhabpur.habiganj.gov.bd
+upazila_id_300,300,district_id_39,Sunamganj Sadar,সুনামগঞ্জ সদর,sadar.sunamganj.gov.bd
+upazila_id_301,301,district_id_39,South Sunamganj,দক্ষিণ সুনামগঞ্জ,southsunamganj.sunamganj.gov.bd
+upazila_id_302,302,district_id_39,Bishwambarpur,বিশ্বম্ভরপুর,bishwambarpur.sunamganj.gov.bd
+upazila_id_303,303,district_id_39,Chhatak,ছাতক,chhatak.sunamganj.gov.bd
+upazila_id_304,304,district_id_39,Jagannathpur,জগন্নাথপুর,jagannathpur.sunamganj.gov.bd
+upazila_id_305,305,district_id_39,Dowarabazar,দোয়ারাবাজার,dowarabazar.sunamganj.gov.bd
+upazila_id_306,306,district_id_39,Tahirpur,তাহিরপুর,tahirpur.sunamganj.gov.bd
+upazila_id_307,307,district_id_39,Dharmapasha,ধর্মপাশা,dharmapasha.sunamganj.gov.bd
+upazila_id_308,308,district_id_39,Jamalganj,জামালগঞ্জ,jamalganj.sunamganj.gov.bd
+upazila_id_309,309,district_id_39,Shalla,শাল্লা,shalla.sunamganj.gov.bd
+upazila_id_310,310,district_id_39,Derai,দিরাই,derai.sunamganj.gov.bd
+upazila_id_311,311,district_id_40,Belabo,বেলাবো,belabo.narsingdi.gov.bd
+upazila_id_312,312,district_id_40,Monohardi,মনোহরদী,monohardi.narsingdi.gov.bd
+upazila_id_313,313,district_id_40,Narsingdi Sadar,নরসিংদী সদর,narsingdisadar.narsingdi.gov.bd
+upazila_id_314,314,district_id_40,Palash,পলাশ,palash.narsingdi.gov.bd
+upazila_id_315,315,district_id_40,Raipura,রায়পুরা,raipura.narsingdi.gov.bd
+upazila_id_316,316,district_id_40,Shibpur,শিবপুর,shibpur.narsingdi.gov.bd
+upazila_id_317,317,district_id_41,Kaliganj,কালীগঞ্জ,kaliganj.gazipur.gov.bd
+upazila_id_318,318,district_id_41,Kaliakair,কালিয়াকৈর,kaliakair.gazipur.gov.bd
+upazila_id_319,319,district_id_41,Kapasia,কাপাসিয়া,kapasia.gazipur.gov.bd
+upazila_id_320,320,district_id_41,Gazipur Sadar,গাজীপুর সদর,sadar.gazipur.gov.bd
+upazila_id_321,321,district_id_41,Sreepur,শ্রীপুর,sreepur.gazipur.gov.bd
+upazila_id_322,322,district_id_42,Shariatpur Sadar,শরিয়তপুর সদর,sadar.shariatpur.gov.bd
+upazila_id_323,323,district_id_42,Naria,নড়িয়া,naria.shariatpur.gov.bd
+upazila_id_324,324,district_id_42,Zajira,জাজিরা,zajira.shariatpur.gov.bd
+upazila_id_325,325,district_id_42,Gosairhat,গোসাইরহাট,gosairhat.shariatpur.gov.bd
+upazila_id_326,326,district_id_42,Bhedarganj,ভেদরগঞ্জ,bhedarganj.shariatpur.gov.bd
+upazila_id_327,327,district_id_42,Damudya,ডামুড্যা,damudya.shariatpur.gov.bd
+upazila_id_328,328,district_id_43,Araihazar,আড়াইহাজার,araihazar.narayanganj.gov.bd
+upazila_id_329,329,district_id_43,Bandar,বন্দর,bandar.narayanganj.gov.bd
+upazila_id_330,330,district_id_43,Narayanganj Sadar,নারায়নগঞ্জ সদর,narayanganjsadar.narayanganj.gov.bd
+upazila_id_331,331,district_id_43,Rupganj,রূপগঞ্জ,rupganj.narayanganj.gov.bd
+upazila_id_332,332,district_id_43,Sonargaon,সোনারগাঁ,sonargaon.narayanganj.gov.bd
+upazila_id_333,333,district_id_44,Basail,বাসাইল,basail.tangail.gov.bd
+upazila_id_334,334,district_id_44,Bhuapur,ভুয়াপুর,bhuapur.tangail.gov.bd
+upazila_id_335,335,district_id_44,Delduar,দেলদুয়ার,delduar.tangail.gov.bd
+upazila_id_336,336,district_id_44,Ghatail,ঘাটাইল,ghatail.tangail.gov.bd
+upazila_id_337,337,district_id_44,Gopalpur,গোপালপুর,gopalpur.tangail.gov.bd
+upazila_id_338,338,district_id_44,Madhupur,মধুপুর,madhupur.tangail.gov.bd
+upazila_id_339,339,district_id_44,Mirzapur,মির্জাপুর,mirzapur.tangail.gov.bd
+upazila_id_340,340,district_id_44,Nagarpur,নাগরপুর,nagarpur.tangail.gov.bd
+upazila_id_341,341,district_id_44,Sakhipur,সখিপুর,sakhipur.tangail.gov.bd
+upazila_id_342,342,district_id_44,Tangail Sadar,টাঙ্গাইল সদর,tangailsadar.tangail.gov.bd
+upazila_id_343,343,district_id_44,Kalihati,কালিহাতী,kalihati.tangail.gov.bd
+upazila_id_344,344,district_id_44,Dhanbari,ধনবাড়ী,dhanbari.tangail.gov.bd
+upazila_id_345,345,district_id_45,Itna,ইটনা,itna.kishoreganj.gov.bd
+upazila_id_346,346,district_id_45,Katiadi,কটিয়াদী,katiadi.kishoreganj.gov.bd
+upazila_id_347,347,district_id_45,Bhairab,ভৈরব,bhairab.kishoreganj.gov.bd
+upazila_id_348,348,district_id_45,Tarail,তাড়াইল,tarail.kishoreganj.gov.bd
+upazila_id_349,349,district_id_45,Hossainpur,হোসেনপুর,hossainpur.kishoreganj.gov.bd
+upazila_id_350,350,district_id_45,Pakundia,পাকুন্দিয়া,pakundia.kishoreganj.gov.bd
+upazila_id_351,351,district_id_45,Kuliarchar,কুলিয়ারচর,kuliarchar.kishoreganj.gov.bd
+upazila_id_352,352,district_id_45,Kishoreganj Sadar,কিশোরগঞ্জ সদর,kishoreganjsadar.kishoreganj.gov.bd
+upazila_id_353,353,district_id_45,Karimgonj,করিমগঞ্জ,karimgonj.kishoreganj.gov.bd
+upazila_id_354,354,district_id_45,Bajitpur,বাজিতপুর,bajitpur.kishoreganj.gov.bd
+upazila_id_355,355,district_id_45,Austagram,অষ্টগ্রাম,austagram.kishoreganj.gov.bd
+upazila_id_356,356,district_id_45,Mithamoin,মিঠামইন,mithamoin.kishoreganj.gov.bd
+upazila_id_357,357,district_id_45,Nikli,নিকলী,nikli.kishoreganj.gov.bd
+upazila_id_358,358,district_id_46,Harirampur,হরিরামপুর,harirampur.manikganj.gov.bd
+upazila_id_359,359,district_id_46,Saturia,সাটুরিয়া,saturia.manikganj.gov.bd
+upazila_id_360,360,district_id_46,Manikganj Sadar,মানিকগঞ্জ সদর,sadar.manikganj.gov.bd
+upazila_id_361,361,district_id_46,Gior,ঘিওর,gior.manikganj.gov.bd
+upazila_id_362,362,district_id_46,Shibaloy,শিবালয়,shibaloy.manikganj.gov.bd
+upazila_id_363,363,district_id_46,Doulatpur,দৌলতপুর,doulatpur.manikganj.gov.bd
+upazila_id_364,364,district_id_46,Singiar,সিংগাইর,singiar.manikganj.gov.bd
+upazila_id_365,365,district_id_47,Savar,সাভার,savar.dhaka.gov.bd
+upazila_id_366,366,district_id_47,Dhamrai,ধামরাই,dhamrai.dhaka.gov.bd
+upazila_id_367,367,district_id_47,Keraniganj,কেরাণীগঞ্জ,keraniganj.dhaka.gov.bd
+upazila_id_368,368,district_id_47,Nawabganj,নবাবগঞ্জ,nawabganj.dhaka.gov.bd
+upazila_id_369,369,district_id_47,Dohar,দোহার,dohar.dhaka.gov.bd
+upazila_id_370,370,district_id_48,Munshiganj Sadar,মুন্সিগঞ্জ সদর,sadar.munshiganj.gov.bd
+upazila_id_371,371,district_id_48,Sreenagar,শ্রীনগর,sreenagar.munshiganj.gov.bd
+upazila_id_372,372,district_id_48,Sirajdikhan,সিরাজদিখান,sirajdikhan.munshiganj.gov.bd
+upazila_id_373,373,district_id_48,Louhajanj,লৌহজং,louhajanj.munshiganj.gov.bd
+upazila_id_374,374,district_id_48,Gajaria,গজারিয়া,gajaria.munshiganj.gov.bd
+upazila_id_375,375,district_id_48,Tongibari,টংগীবাড়ি,tongibari.munshiganj.gov.bd
+upazila_id_376,376,district_id_49,Rajbari Sadar,রাজবাড়ী সদর,sadar.rajbari.gov.bd
+upazila_id_377,377,district_id_49,Goalanda,গোয়ালন্দ,goalanda.rajbari.gov.bd
+upazila_id_378,378,district_id_49,Pangsa,পাংশা,pangsa.rajbari.gov.bd
+upazila_id_379,379,district_id_49,Baliakandi,বালিয়াকান্দি,baliakandi.rajbari.gov.bd
+upazila_id_380,380,district_id_49,Kalukhali,কালুখালী,kalukhali.rajbari.gov.bd
+upazila_id_381,381,district_id_50,Madaripur Sadar,মাদারীপুর সদর,sadar.madaripur.gov.bd
+upazila_id_382,382,district_id_50,Shibchar,শিবচর,shibchar.madaripur.gov.bd
+upazila_id_383,383,district_id_50,Kalkini,কালকিনি,kalkini.madaripur.gov.bd
+upazila_id_384,384,district_id_50,Rajoir,রাজৈর,rajoir.madaripur.gov.bd
+upazila_id_385,385,district_id_51,Gopalganj Sadar,গোপালগঞ্জ সদর,sadar.gopalganj.gov.bd
+upazila_id_386,386,district_id_51,Kashiani,কাশিয়ানী,kashiani.gopalganj.gov.bd
+upazila_id_387,387,district_id_51,Tungipara,টুংগীপাড়া,tungipara.gopalganj.gov.bd
+upazila_id_388,388,district_id_51,Kotalipara,কোটালীপাড়া,kotalipara.gopalganj.gov.bd
+upazila_id_389,389,district_id_51,Muksudpur,মুকসুদপুর,muksudpur.gopalganj.gov.bd
+upazila_id_390,390,district_id_52,Faridpur Sadar,ফরিদপুর সদর,sadar.faridpur.gov.bd
+upazila_id_391,391,district_id_52,Alfadanga,আলফাডাঙ্গা,alfadanga.faridpur.gov.bd
+upazila_id_392,392,district_id_52,Boalmari,বোয়ালমারী,boalmari.faridpur.gov.bd
+upazila_id_393,393,district_id_52,Sadarpur,সদরপুর,sadarpur.faridpur.gov.bd
+upazila_id_394,394,district_id_52,Nagarkanda,নগরকান্দা,nagarkanda.faridpur.gov.bd
+upazila_id_395,395,district_id_52,Bhanga,ভাঙ্গা,bhanga.faridpur.gov.bd
+upazila_id_396,396,district_id_52,Charbhadrasan,চরভদ্রাসন,charbhadrasan.faridpur.gov.bd
+upazila_id_397,397,district_id_52,Madhukhali,মধুখালী,madhukhali.faridpur.gov.bd
+upazila_id_398,398,district_id_52,Saltha,সালথা,saltha.faridpur.gov.bd
+upazila_id_399,399,district_id_53,Panchagarh Sadar,পঞ্চগড় সদর,panchagarhsadar.panchagarh.gov.bd
+upazila_id_400,400,district_id_53,Debiganj,দেবীগঞ্জ,debiganj.panchagarh.gov.bd
+upazila_id_401,401,district_id_53,Boda,বোদা,boda.panchagarh.gov.bd
+upazila_id_402,402,district_id_53,Atwari,আটোয়ারী,atwari.panchagarh.gov.bd
+upazila_id_403,403,district_id_53,Tetulia,তেতুলিয়া,tetulia.panchagarh.gov.bd
+upazila_id_404,404,district_id_54,Nawabganj,নবাবগঞ্জ,nawabganj.dinajpur.gov.bd
+upazila_id_405,405,district_id_54,Birganj,বীরগঞ্জ,birganj.dinajpur.gov.bd
+upazila_id_406,406,district_id_54,Ghoraghat,ঘোড়াঘাট,ghoraghat.dinajpur.gov.bd
+upazila_id_407,407,district_id_54,Birampur,বিরামপুর,birampur.dinajpur.gov.bd
+upazila_id_408,408,district_id_54,Parbatipur,পার্বতীপুর,parbatipur.dinajpur.gov.bd
+upazila_id_409,409,district_id_54,Bochaganj,বোচাগঞ্জ,bochaganj.dinajpur.gov.bd
+upazila_id_410,410,district_id_54,Kaharol,কাহারোল,kaharol.dinajpur.gov.bd
+upazila_id_411,411,district_id_54,Fulbari,ফুলবাড়ী,fulbari.dinajpur.gov.bd
+upazila_id_412,412,district_id_54,Dinajpur Sadar,দিনাজপুর সদর,dinajpursadar.dinajpur.gov.bd
+upazila_id_413,413,district_id_54,Hakimpur,হাকিমপুর,hakimpur.dinajpur.gov.bd
+upazila_id_414,414,district_id_54,Khansama,খানসামা,khansama.dinajpur.gov.bd
+upazila_id_415,415,district_id_54,Birol,বিরল,birol.dinajpur.gov.bd
+upazila_id_416,416,district_id_54,Chirirbandar,চিরিরবন্দর,chirirbandar.dinajpur.gov.bd
+upazila_id_417,417,district_id_55,Lalmonirhat Sadar,লালমনিরহাট সদর,sadar.lalmonirhat.gov.bd
+upazila_id_418,418,district_id_55,Kaliganj,কালীগঞ্জ,kaliganj.lalmonirhat.gov.bd
+upazila_id_419,419,district_id_55,Hatibandha,হাতীবান্ধা,hatibandha.lalmonirhat.gov.bd
+upazila_id_420,420,district_id_55,Patgram,পাটগ্রাম,patgram.lalmonirhat.gov.bd
+upazila_id_421,421,district_id_55,Aditmari,আদিতমারী,aditmari.lalmonirhat.gov.bd
+upazila_id_422,422,district_id_56,Syedpur,সৈয়দপুর,syedpur.nilphamari.gov.bd
+upazila_id_423,423,district_id_56,Domar,ডোমার,domar.nilphamari.gov.bd
+upazila_id_424,424,district_id_56,Dimla,ডিমলা,dimla.nilphamari.gov.bd
+upazila_id_425,425,district_id_56,Jaldhaka,জলঢাকা,jaldhaka.nilphamari.gov.bd
+upazila_id_426,426,district_id_56,Kishorganj,কিশোরগঞ্জ,kishorganj.nilphamari.gov.bd
+upazila_id_427,427,district_id_56,Nilphamari Sadar,নীলফামারী সদর,nilphamarisadar.nilphamari.gov.bd
+upazila_id_428,428,district_id_57,Sadullapur,সাদুল্লাপুর,sadullapur.gaibandha.gov.bd
+upazila_id_429,429,district_id_57,Gaibandha Sadar,গাইবান্ধা সদর,gaibandhasadar.gaibandha.gov.bd
+upazila_id_430,430,district_id_57,Palashbari,পলাশবাড়ী,palashbari.gaibandha.gov.bd
+upazila_id_431,431,district_id_57,Saghata,সাঘাটা,saghata.gaibandha.gov.bd
+upazila_id_432,432,district_id_57,Gobindaganj,গোবিন্দগঞ্জ,gobindaganj.gaibandha.gov.bd
+upazila_id_433,433,district_id_57,Sundarganj,সুন্দরগঞ্জ,sundarganj.gaibandha.gov.bd
+upazila_id_434,434,district_id_57,Phulchari,ফুলছড়ি,phulchari.gaibandha.gov.bd
+upazila_id_435,435,district_id_58,Thakurgaon Sadar,ঠাকুরগাঁও সদর,thakurgaonsadar.thakurgaon.gov.bd
+upazila_id_436,436,district_id_58,Pirganj,পীরগঞ্জ,pirganj.thakurgaon.gov.bd
+upazila_id_437,437,district_id_58,Ranisankail,রাণীশংকৈল,ranisankail.thakurgaon.gov.bd
+upazila_id_438,438,district_id_58,Haripur,হরিপুর,haripur.thakurgaon.gov.bd
+upazila_id_439,439,district_id_58,Baliadangi,বালিয়াডাঙ্গী,baliadangi.thakurgaon.gov.bd
+upazila_id_440,440,district_id_59,Rangpur Sadar,রংপুর সদর,rangpursadar.rangpur.gov.bd
+upazila_id_441,441,district_id_59,Gangachara,গংগাচড়া,gangachara.rangpur.gov.bd
+upazila_id_442,442,district_id_59,Taragonj,তারাগঞ্জ,taragonj.rangpur.gov.bd
+upazila_id_443,443,district_id_59,Badargonj,বদরগঞ্জ,badargonj.rangpur.gov.bd
+upazila_id_444,444,district_id_59,Mithapukur,মিঠাপুকুর,mithapukur.rangpur.gov.bd
+upazila_id_445,445,district_id_59,Pirgonj,পীরগঞ্জ,pirgonj.rangpur.gov.bd
+upazila_id_446,446,district_id_59,Kaunia,কাউনিয়া,kaunia.rangpur.gov.bd
+upazila_id_447,447,district_id_59,Pirgacha,পীরগাছা,pirgacha.rangpur.gov.bd
+upazila_id_448,448,district_id_60,Kurigram Sadar,কুড়িগ্রাম সদর,kurigramsadar.kurigram.gov.bd
+upazila_id_449,449,district_id_60,Nageshwari,নাগেশ্বরী,nageshwari.kurigram.gov.bd
+upazila_id_450,450,district_id_60,Bhurungamari,ভুরুঙ্গামারী,bhurungamari.kurigram.gov.bd
+upazila_id_451,451,district_id_60,Phulbari,ফুলবাড়ী,phulbari.kurigram.gov.bd
+upazila_id_452,452,district_id_60,Rajarhat,রাজারহাট,rajarhat.kurigram.gov.bd
+upazila_id_453,453,district_id_60,Ulipur,উলিপুর,ulipur.kurigram.gov.bd
+upazila_id_454,454,district_id_60,Chilmari,চিলমারী,chilmari.kurigram.gov.bd
+upazila_id_455,455,district_id_60,Rowmari,রৌমারী,rowmari.kurigram.gov.bd
+upazila_id_456,456,district_id_60,Charrajibpur,চর রাজিবপুর,charrajibpur.kurigram.gov.bd
+upazila_id_457,457,district_id_61,Sherpur Sadar,শেরপুর সদর,sherpursadar.sherpur.gov.bd
+upazila_id_458,458,district_id_61,Nalitabari,নালিতাবাড়ী,nalitabari.sherpur.gov.bd
+upazila_id_459,459,district_id_61,Sreebordi,শ্রীবরদী,sreebordi.sherpur.gov.bd
+upazila_id_460,460,district_id_61,Nokla,নকলা,nokla.sherpur.gov.bd
+upazila_id_461,461,district_id_61,Jhenaigati,ঝিনাইগাতী,jhenaigati.sherpur.gov.bd
+upazila_id_462,462,district_id_62,Fulbaria,ফুলবাড়ীয়া,fulbaria.mymensingh.gov.bd
+upazila_id_463,463,district_id_62,Trishal,ত্রিশাল,trishal.mymensingh.gov.bd
+upazila_id_464,464,district_id_62,Bhaluka,ভালুকা,bhaluka.mymensingh.gov.bd
+upazila_id_465,465,district_id_62,Muktagacha,মুক্তাগাছা,muktagacha.mymensingh.gov.bd
+upazila_id_466,466,district_id_62,Mymensingh Sadar,ময়মনসিংহ সদর,mymensinghsadar.mymensingh.gov.bd
+upazila_id_467,467,district_id_62,Dhobaura,ধোবাউড়া,dhobaura.mymensingh.gov.bd
+upazila_id_468,468,district_id_62,Phulpur,ফুলপুর,phulpur.mymensingh.gov.bd
+upazila_id_469,469,district_id_62,Haluaghat,হালুয়াঘাট,haluaghat.mymensingh.gov.bd
+upazila_id_470,470,district_id_62,Gouripur,গৌরীপুর,gouripur.mymensingh.gov.bd
+upazila_id_471,471,district_id_62,Gafargaon,গফরগাঁও,gafargaon.mymensingh.gov.bd
+upazila_id_472,472,district_id_62,Iswarganj,ঈশ্বরগঞ্জ,iswarganj.mymensingh.gov.bd
+upazila_id_473,473,district_id_62,Nandail,নান্দাইল,nandail.mymensingh.gov.bd
+upazila_id_474,474,district_id_62,Tarakanda,তারাকান্দা,tarakanda.mymensingh.gov.bd
+upazila_id_475,475,district_id_63,Jamalpur Sadar,জামালপুর সদর,jamalpursadar.jamalpur.gov.bd
+upazila_id_476,476,district_id_63,Melandah,মেলান্দহ,melandah.jamalpur.gov.bd
+upazila_id_477,477,district_id_63,Islampur,ইসলামপুর,islampur.jamalpur.gov.bd
+upazila_id_478,478,district_id_63,Dewangonj,দেওয়ানগঞ্জ,dewangonj.jamalpur.gov.bd
+upazila_id_479,479,district_id_63,Sarishabari,সরিষাবাড়ী,sarishabari.jamalpur.gov.bd
+upazila_id_480,480,district_id_63,Madarganj,মাদারগঞ্জ,madarganj.jamalpur.gov.bd
+upazila_id_481,481,district_id_63,Bokshiganj,বকশীগঞ্জ,bokshiganj.jamalpur.gov.bd
+upazila_id_482,482,district_id_64,Barhatta,বারহাট্টা,barhatta.netrokona.gov.bd
+upazila_id_483,483,district_id_64,Durgapur,দুর্গাপুর,durgapur.netrokona.gov.bd
+upazila_id_484,484,district_id_64,Kendua,কেন্দুয়া,kendua.netrokona.gov.bd
+upazila_id_485,485,district_id_64,Atpara,আটপাড়া,atpara.netrokona.gov.bd
+upazila_id_486,486,district_id_64,Madan,মদন,madan.netrokona.gov.bd
+upazila_id_487,487,district_id_64,Khaliajuri,খালিয়াজুরী,khaliajuri.netrokona.gov.bd
+upazila_id_488,488,district_id_64,Kalmakanda,কলমাকান্দা,kalmakanda.netrokona.gov.bd
+upazila_id_489,489,district_id_64,Mohongonj,মোহনগঞ্জ,mohongonj.netrokona.gov.bd
+upazila_id_490,490,district_id_64,Purbadhala,পূর্বধলা,purbadhala.netrokona.gov.bd
+upazila_id_491,491,district_id_64,Netrokona Sadar,নেত্রকোণা সদর,netrokonasadar.netrokona.gov.bd
+upazila_id_492,492,district_id_9,Eidgaon,ঈদগাঁও,null
+upazila_id_493,493,district_id_39,Madhyanagar,মধ্যনগর,null
+upazila_id_494,494,district_id_50,Dasar,ডাসার,null

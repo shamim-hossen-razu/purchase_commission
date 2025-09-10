@@ -26,14 +26,24 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'data/bangladesh.divisions.csv',
+        'data/bangladesh.districts.csv',
+        'data/bangladesh.upazilas.csv',
+        'data/bangladesh.unions.csv',
         'views/customer_commission_config_views.xml',
         'views/res_partner_views.xml',
+        'views/res_company_address_views.xml',
         'views/customer_commission_views.xml',
         'views/sale_order_views.xml',
         'views/product_template_views.xml',
         'views/report_saleorder_inherit.xml',
         'views/setting_views.xml',
         'views/commission_menu.xml',
+        'views/divisions_views.xml',
+        'views/districts_views.xml',
+        'views/upazila_views.xml',
+        'views/union_views.xml',
+        'views/contact_setting_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_district_list" model="ir.ui.view">
+        <field name="name">district.list</field>
+        <field name="model">bangladesh.districts</field>
+        <field name="arch" type="xml">
+            <list string="Districts">
+                <field name="district_id"/>
+                <field name="name"/>
+                <field name="bn_name"/>
+                <field name="url"/>
+                <field name="division_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_district_form" model="ir.ui.view">
+        <field name="name">district.form</field>
+        <field name="model">bangladesh.districts</field>
+        <field name="arch" type="xml">
+            <form string="District">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="bn_name"/>
+                            <field name="district_id"/>
+                        </group>
+                        <group>
+                            <field name="division_id"/>
+                            <field name="url"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Upazilas">
+                            <field name="upazila_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="district_search_view" model="ir.ui.view">
+        <field name="name">district.search</field>
+        <field name="model">bangladesh.districts</field>
+        <field name="arch" type="xml">
+            <search string="Search Districts">
+                <field name="name"/>
+                <field name="bn_name"/>
+                <field name="district_id"/>
+                <field name="division_id"/>
+                <filter string="By Division" name="by_division" domain="[]" context="{'group_by':'division_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_district" model="ir.actions.act_window">
+        <field name="name">Districts</field>
+        <field name="res_model">bangladesh.districts</field>
+        <field name="view_mode">list,form,search</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create the first District
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_district"
+              name="Districts"
+              action="action_district"
+              parent="bd_address_format"
+              groups="base.group_user"
+              sequence="2"/>
+</odoo>

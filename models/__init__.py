@@ -8,7 +8,12 @@ from . import sale_order_line
 from . import sale_order
 from . import res_config_setting
 from . import product_template
-
+from . import divisions
+from . import districts
+from . import upazilas
+from . import unions
+from . import partner_address
+from . import company_address
 
 
 

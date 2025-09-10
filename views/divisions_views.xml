@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_division_list" model="ir.ui.view">
+        <field name="name">division.list</field>
+        <field name="model">bangladesh.divisions</field>
+        <field name="arch" type="xml">
+            <list string="Divisions">
+                <field name="division_id"/>
+                <field name="name"/>
+                <field name="bn_name"/>
+                <field name="url"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_division_form" model="ir.ui.view">
+        <field name="name">division.form</field>
+        <field name="model">bangladesh.divisions</field>
+        <field name="arch" type="xml">
+            <form string="Division">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="bn_name"/>
+                        </group>
+                        <group>
+                            <field name="url"/>
+                            <field name="division_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Districts">
+                            <field name="district_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="division_search_view" model="ir.ui.view">
+        <field name="name">division.search</field>
+        <field name="model">bangladesh.divisions</field>
+        <field name="arch" type="xml">
+            <search string="Search Divisions">
+                <field name="name"/>
+                <field name="bn_name"/>
+                <field name="division_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_division" model="ir.actions.act_window">
+        <field name="name">Divisions</field>
+        <field name="res_model">bangladesh.divisions</field>
+        <field name="view_mode">list,form,search</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create the first Division
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="bd_address_format"
+              name="BD Address Format"
+              sequence="10"
+              parent="contacts.res_partner_menu_config"
+    />
+
+    <menuitem id="menu_division"
+              name="Divisions"
+              action="action_division"
+              parent="bd_address_format"
+              groups="base.group_user"
+              sequence="1"/>
+
+</odoo>

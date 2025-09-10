@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+
+    <!-- Add a Contacts app block with a Bangladesh address setting -->
+    <record id="res_config_settings_view_form_contacts" model="ir.ui.view">
+      <field name="name">res.config.settings.view.form.inherit.contacts.bd</field>
+      <field name="model">res.config.settings</field>
+      <field name="priority" eval="40"/>
+      <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+      <field name="arch" type="xml">
+        <!-- Insert inside the main settings form -->
+        <xpath expr="//form" position="inside">
+          <app string="Contacts" data-string="Contacts" name="contacts" groups="base.group_user">
+            <block title="Addresses Geocoding" name="contact_setting_container">
+              <setting id="bd_address_geocode_options"
+                       string="Bangladesh Address Format"
+                       help="Format addresses and pick locations using Bangladesh-specific rules.">
+                <label for="bd_format_address"/>
+                <field name="bd_format_address"/>
+              </setting>
+            </block>
+          </app>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Optional: a shortcut menu under Contacts that opens Settings on this module -->
+    <record id="action_contacts_settings_shortcut" model="ir.actions.act_window">
+      <field name="name">Contacts Settings</field>
+      <field name="res_model">res.config.settings</field>
+      <field name="view_mode">form</field>
+      <field name="target">inline</field>
+      <!-- 'module' controls which app block opens focused; keep your module's technical name here -->
+      <field name="context">{'module': 'contacts'}</field>
+    </record>
+
+    <menuitem id="menu_contacts_settings_shortcut"
+              name="Settings"
+              parent="contacts.res_partner_menu_config"
+              sequence="0"
+              action="action_contacts_settings_shortcut"/>
+
+  </data>
+</odoo>

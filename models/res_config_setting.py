@@ -25,3 +25,10 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='purchase_commission.data_sync',
         default=False
     )
+
+    bd_format_address = fields.Boolean(
+        string='BD Format Address',
+        config_parameter='bangladesh_geocode.bd_format_address',
+        default=False
+    )
+

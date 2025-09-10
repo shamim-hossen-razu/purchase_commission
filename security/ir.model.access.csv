@@ -2,3 +2,7 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_customer_discount_config_user,customer_commission_config_user,model_customer_commission_config,sales_team.group_sale_salesman,1,0,0,0
 access_customer_discount_config_manager,customer_commission_config_manager,model_customer_commission_config,sales_team.group_sale_manager,1,1,1,1
 access_customer_commission_manager,customer_commission_manager,model_customer_commission,sales_team.group_sale_manager,1,1,1,1
+access_division,access_division,model_bangladesh_divisions,base.group_user,1,0,0,0
+access_district,access_district,model_bangladesh_districts,base.group_user,1,0,0,0
+access_upazila,access_upazila,model_bangladesh_upazilas,base.group_user,1,0,0,0
+access_union,access_union,model_bangladesh_unions,base.group_user,1,0,0,0

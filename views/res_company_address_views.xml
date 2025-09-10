@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="view_res_partner_form_inherit_bangladesh" model="ir.ui.view">
-        <field name="name">res.partner.form.inherit.bangladesh</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
+     <record id="view_res_company_form_inherit_bangladesh" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.bangladesh</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='phone']" position="before">
                 <field name="bd_format_address" invisible="True"/>
@@ -26,28 +26,6 @@
                     <field name="house_no" string="House/Shop" placeholder="বাড়ি / দোকানের নাম / নম্বর"
                            class="o_address_street" invisible="not bd_format_address"/>
                 </div>
-            </xpath>
-        </field>
-    </record>
-
-
-    <record id="res_partner_commission_view_buttons" model="ir.ui.view">
-        <field name="name">res.partner.commission.view.buttons</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="priority" eval="3"/>
-        <field name="arch" type="xml">
-            <div name="button_box" position="inside">
-                <button class="oe_stat_button" type="object" name="action_view_partner_commission"
-                        groups="sales_team.group_sale_salesman"
-                        invisible="commission_count==0"
-                        icon="fa-percent">
-                    <field string="Commissions" name="commission_count" widget="statinfo"
-                           invisible="commission_count==0"/>
-                </button>
-            </div>
-            <xpath expr="//field[@name='vat']" position="after">
-                <field name="related_partner_id" readonly="True"/>
             </xpath>
         </field>
     </record>
