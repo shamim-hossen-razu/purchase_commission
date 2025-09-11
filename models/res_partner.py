@@ -68,45 +68,66 @@ class ResPartner(models.Model):
         if single_record:
             vals_list = [vals_list]
 
-        # Process each record
-        for vals in vals_list:
-            # remove key avalara_partner_code and avalara_exemption_id if exists
-            if vals.get('mobile'):
-                vals['mobile'] = self._format_mobile_number(vals['mobile'])
-                if self._db_sync_enabled():
-                    config = self._get_external_config()
-                    url = config['url']
-                    db = config['db']
-                    uid = config['uid']
-                    password = config['password']
-                    models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
-
-                    # when same user with name and mobile already available in remote db, do nothing
-                    existing_records = models.execute_kw(db, uid, password, 'res.partner', 'search',
-                            [[['name', '=', vals.get('name')], ['mobile', '=', vals.get('mobile')]]])
-
-                    # If no existing record found, create a new one in the remote DB
-                    if not existing_records:
-                        vals['customer_rank'] = 1
-                        vals['related_partner_id'] = models.execute_kw(db, uid, password, 'res.partner', 'create', [vals])
-        # Call super with the processed data
-        return super(ResPartner, self).create(vals_list)
-
-    def write(self, vals):
-        """Format mobile number during updates"""
-        if vals.get('mobile'):
-            vals['mobile'] = self._format_mobile_number(vals['mobile'])
+        remote_models = None
         if self._db_sync_enabled():
             config = self._get_external_config()
             url = config['url']
             db = config['db']
             uid = config['uid']
             password = config['password']
-            models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
-            # update the related partner in remote db if related_partner_id is set
-            if self.related_partner_id:
-                models.execute_kw(db, uid, password, 'res.partner', 'write', [[self.related_partner_id], vals])
-        return super(ResPartner, self).write(vals)
+            remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+
+        # Process each record
+        for vals in vals_list:
+            # remove key avalara_partner_code and avalara_exemption_id if exists
+            if vals.get('mobile'):
+                vals['mobile'] = self._format_mobile_number(vals['mobile'])
+                # when user with same name and mobile already available in remote db, do nothing
+                existing_records = remote_models.execute_kw(db, uid, password, 'res.partner', 'search',
+                        [[['name', '=', vals.get('name')], ['mobile', '=', vals.get('mobile')]]])
+                # If no existing record found, create a new one in the remote DB
+                if not existing_records:
+                    if vals.get('child_ids', False):
+                        child_ids = vals['child_ids'].copy()
+                        # remove child_ids before creating company record
+                        vals.pop('child_ids')
+                        # create company record in remote db
+                        remote_record_id = remote_models.execute_kw(db, uid, password, 'res.partner', 'create', [vals])
+                        # revert child_ids info on vals
+                        vals['child_ids'] = child_ids
+                        # create child record in remote database
+                        for child in child_ids:
+                            child[2]['parent_id'] = remote_record_id
+                            remote_models.execute_kw(db, uid, password, 'res.partner', 'create', [child[2]])
+                    else:
+                        remote_models.execute_kw(db, uid, password, 'res.partner', 'create', [vals])
+        new_partners = super(ResPartner, self).create(vals_list)
+        for partner in new_partners:
+            if not partner.related_partner_id:
+                # find related record id from remote db
+                remote_record = remote_models.execute_kw(db, uid, password, 'res.partner', 'search',
+                                                         [[['name', '=', partner.name],
+                                                           ['mobile', '=', partner.mobile]]], {'limit': 1})
+                # write related partner id from main  database to remote record
+                remote_models.execute_kw(db, uid, password, 'res.partner', 'write',
+                                         [remote_record, {'related_partner_id': partner.id}])
+                # write related partner id from remote database to main record
+                partner.write({'related_partner_id': remote_record[0] if remote_record else False})
+        return new_partners
+
+    # def write(self, vals):
+    #     """Format mobile number during updates"""
+    #     if vals.get('mobile'):
+    #         vals['mobile'] = self._format_mobile_number(vals['mobile'])
+    #     if self._db_sync_enabled():
+    #         config = self._get_external_config()
+    #         url = config['url']
+    #         db = config['db']
+    #         uid = config['uid']
+    #         password = config['password']
+    #         res_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+    #         res_models.execute_kw(db, uid, password, 'res.partner', 'write', [self.related_partner_id, vals])
+    #     return super(ResPartner, self).write(vals)
 
     @api.constrains('mobile', 'name')
     def _check_unique_customer(self):
