@@ -7,6 +7,7 @@
                 <t t-set="company" t-value="user.company_id.sudo()"/>
                 <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
                 <t t-set="is_proforma" t-value="env.context.get('proforma', False) or is_pro_forma"/>
+                <t t-set="bd_format" t-value="env['ir.config_parameter'].sudo().get_param('purchase_commission.bd_format_address')"/>
                 <t t-set="layout_document_title">
                     <span t-if="is_proforma">Pro-Forma Invoice # </span>
                     <span t-elif="o.state in ['draft','sent']">Quotation # </span>
@@ -26,64 +27,85 @@
 
                                 <!-- Company Details -->
                                 <div class="company-details">
-                                    <span t-field="company.name"/>
-                                    <t t-set="company_street" t-value="', '.join(filter(lambda x:x, [company.street2, company.street, company.zip]))"/>
-                                    <div t-if="company_street" t-out="company_street"/>
-                                    <div t-if="company.country_id"> <span t-field="company.country_id"/></div>
-                                    <div t-if="company.phone"><i class="fa fa-phone" aria-hidden="true"/> <span t-field="company.phone"/></div>
+                                    <strong><span t-field="company.name"/></strong>
+                                    <t t-if="bd_format == 'True'">
+                                        <p>
+                                            <t t-if="company.house_no or company.road_no">
+                                                <span t-if="company.house_no"><t t-out="company.house_no"/></span>
+                                                <span t-if="company.road_no">, <t t-out="company.road_no"/></span>
+                                                <br/>
+                                            </t>
+                                            <t t-if="company.union_id or company.upazila_id">
+                                                <span t-if="company.union_id"><t t-out="company.union_id.name"/></span>
+                                                <span t-if="company.upazila_id">, <t t-out="company.upazila_id.name"/></span>
+                                                <br/>
+                                            </t>
+                                            <t t-if="company.district_id or company.division_id">
+                                                <span t-if="company.district_id"><t t-out="company.district_id.name"/></span>
+                                                <span t-if="company.division_id">, <t t-out="company.division_id.name"/></span>
+                                            </t>
+                                        </p>
+                                    </t>
+                                    <t t-else="bd_format != 'True'">
+                                        <t t-set="company_street" t-value="', '.join(filter(lambda x:x, [company.street2, company.street, company.zip]))"/>
+                                        <div t-if="company_street" t-out="company_street"/>
+                                        <div t-if="company.country_id"> <span t-field="company.country_id"/></div>
+                                        <div t-if="company.phone"><i class="fa fa-phone" aria-hidden="true"/> <span t-field="company.phone"/></div>
+                                    </t>
                                 </div>
                             </div>
 
-                            <div class="col-6" style="text-align: right; padding-bottom: 15px;">
+                            <div class="col-6" style="text-align: right; padding-bottom: 10px;">
                                 <h1><t t-out="layout_document_title"/></h1>
-                                <div>
-                                    <t t-if="(o.partner_shipping_id == o.partner_invoice_id and o.partner_invoice_id != o.partner_id)
-                                           or (o.partner_shipping_id != o.partner_invoice_id)">
-                                        <div class="col-6">
-                                            <strong>
-                                                <t t-if="o.partner_shipping_id == o.partner_invoice_id">
-                                                    Invoicing and Shipping Address
-                                                </t>
-                                                <t t-else="">Invoicing Address</t>
-                                            </strong>
-                                            <div t-field="o.partner_invoice_id"
-                                                 t-options='{"widget":"contact","fields":["address","name","phone"],"no_marker":True,"phone_icons":True}'/>
-                                        </div>
-
-                                        <div class="col-6" t-if="o.partner_shipping_id != o.partner_invoice_id">
-                                            <strong>Shipping Address</strong>
-                                            <div t-field="o.partner_shipping_id"
-                                                 t-options='{"widget":"contact","fields":["address","name","phone"],"no_marker":True,"phone_icons":True}'/>
-                                        </div>
-                                    </t>
-                                </div>
-
                                 <!-- ROW 3: Invoicing/Shipping address logic always -->
                                 <div>
-                                    <div t-field="o.partner_id"
-                                         t-options='{"widget":"contact","fields":["name","address"],"no_marker":True}'/>
-                                    <p t-if="o.partner_id.vat" class="m-0">
-                                        <t t-out="o.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>:
-                                        <span t-field="o.partner_id.vat"/>
-                                    </p>
+                                    <t t-if="bd_format == 'True'">
+                                        <div class="bd-address">
+                                            <p>
+                                                <strong><t t-out="o.partner_id.name"/></strong><br/>
+                                                <t t-if="o.partner_id.house_no or o.partner_id.road_no">
+                                                    <span t-if="o.partner_id.house_no"><t t-out="o.partner_id.house_no"/></span>
+                                                    <span t-if="o.partner_id.road_no">, <t t-out="o.partner_id.road_no"/></span>
+                                                    <br/>
+                                                </t>
+                                                <t t-if="o.partner_id.union_id or o.partner_id.upazila_id">
+                                                    <span t-if="o.partner_id.union_id"><t t-out="o.partner_id.union_id.name"/></span>
+                                                    <span t-if="o.partner_id.upazila_id">, <t t-out="o.partner_id.upazila_id.name"/></span>
+                                                    <br/>
+                                                </t>
+                                                <t t-if="o.partner_id.district_id or o.partner_id.division_id">
+                                                    <span t-if="o.partner_id.district_id"><t t-out="o.partner_id.district_id.name"/></span>
+                                                    <span t-if="o.partner_id.division_id">, <t t-out="o.partner_id.division_id.name"/></span>
+                                                </t>
+                                            </p>
+                                        </div>
+                                    </t>
+                                    <t t-else="bd_format != 'True'">
+                                        <div t-field="o.partner_id"
+                                             t-options='{"widget":"contact","fields":["name","address"],"no_marker":True}'/>
+                                        <p t-if="o.partner_id.vat" class="m-0">
+                                            <t t-out="o.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>:
+                                            <span t-field="o.partner_id.vat"/>
+                                        </p>
+                                    </t>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row" style="padding-bottom: 15px;">
-                            <div t-if="o.date_order" class="col">
+                        <div class="row" style="padding-top: 5px; padding-bottom: 10px;">
+                            <div t-if="o.date_order" class="col-4 text-start">
                                 <strong t-if="is_proforma">Issued Date</strong>
                                 <strong t-elif="o.state in ['draft','sent']">Quotation Date</strong>
                                 <strong t-else="">Order Date: </strong>
                                 <div t-field="o.date_order" t-options='{"widget": "date"}'/>
                             </div>
 
-                            <div t-if="o.validity_date and o.state in ['draft','sent']" class="col">
+                            <div t-if="o.validity_date and o.state in ['draft','sent']" class="col-4 text-center">
                                 <strong>Expiration: </strong>
                                 <div t-field="o.validity_date"/>
                             </div>
 
-                            <div t-if="o.user_id.name" class="col">
+                            <div t-if="o.user_id.name" class="col-4 text-end">
                                 <strong>Salesperson: </strong>
                                 <div t-field="o.user_id"/>
                             </div>
@@ -186,7 +208,7 @@
 
                                         <td class="text-end" style="border-top:1px solid #000;">
                                             <!-- Already currency-formatted in Python -->
-                                            <span t-esc="page['qty_display']"/>
+                                            <strong><span t-esc="page['qty_display']"/></strong>
                                         </td>
                                         <!-- Unit Price column (empty, just filler) -->
                                         <td style="border-top:1px solid #000;"> </td>
@@ -196,7 +218,7 @@
 
                                         <td class="text-end" style="border-top:1px solid #000;">
                                             <!-- Already currency-formatted in Python -->
-                                            <span t-esc="page['subtotal_display']"/>
+                                            <strong><span t-esc="page['subtotal_display']"/></strong>
                                         </td>
                                     </tr>
 
@@ -267,8 +289,8 @@
                                                 <strong><t t-out="grand_qty_label"/></strong>
                                             </td>
                                             <td class="text-end">
-                                                <span t-field="o.amount_total"
-                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                                <strong><span t-field="o.amount_total"
+                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/></strong>
                                             </td>
                                         </tr>
                                     </table>
