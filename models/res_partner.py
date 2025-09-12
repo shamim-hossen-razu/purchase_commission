@@ -68,7 +68,7 @@ class ResPartner(models.Model):
         if single_record:
             vals_list = [vals_list]
 
-        remote_models = None
+        remote_models = db = uid = password = None
         if self._db_sync_enabled():
             config = self._get_external_config()
             url = config['url']
@@ -84,7 +84,8 @@ class ResPartner(models.Model):
                 vals['mobile'] = self._format_mobile_number(vals['mobile'])
                 # when user with same name and mobile already available in remote db, do nothing
                 existing_records = remote_models.execute_kw(db, uid, password, 'res.partner', 'search',
-                        [[['name', '=', vals.get('name')], ['mobile', '=', vals.get('mobile')]]])
+                                                            [[['name', '=', vals.get('name')],
+                                                              ['mobile', '=', vals.get('mobile')]]])
                 # If no existing record found, create a new one in the remote DB
                 if not existing_records:
                     if vals.get('child_ids', False):
@@ -115,19 +116,20 @@ class ResPartner(models.Model):
                 partner.write({'related_partner_id': remote_record[0] if remote_record else False})
         return new_partners
 
-    # def write(self, vals):
-    #     """Format mobile number during updates"""
-    #     if vals.get('mobile'):
-    #         vals['mobile'] = self._format_mobile_number(vals['mobile'])
-    #     if self._db_sync_enabled():
-    #         config = self._get_external_config()
-    #         url = config['url']
-    #         db = config['db']
-    #         uid = config['uid']
-    #         password = config['password']
-    #         res_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
-    #         res_models.execute_kw(db, uid, password, 'res.partner', 'write', [self.related_partner_id, vals])
-    #     return super(ResPartner, self).write(vals)
+    def write(self, vals):
+        """Format mobile number during updates"""
+        for rec in self:
+            if vals.get('mobile'):
+                vals['mobile'] = rec._format_mobile_number(vals['mobile'])
+            if rec._db_sync_enabled():
+                config = rec._get_external_config()
+                url = config['url']
+                db = config['db']
+                uid = config['uid']
+                password = config['password']
+                res_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+                res_models.execute_kw(db, uid, password, 'res.partner', 'write', [[rec.related_partner_id], vals])
+        return super(ResPartner, self).write(vals)
 
     @api.constrains('mobile', 'name')
     def _check_unique_customer(self):
@@ -192,7 +194,8 @@ class ResPartner(models.Model):
             for partner in self:
                 if partner.related_partner_id:
                     try:
-                        models_rpc.execute_kw(db, uid, password, 'res.partner', 'unlink', [[partner.related_partner_id]])
+                        models_rpc.execute_kw(db, uid, password, 'res.partner', 'unlink',
+                                              [[partner.related_partner_id]])
                     except Exception:
                         pass
 
