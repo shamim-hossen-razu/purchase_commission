@@ -11,7 +11,7 @@ class SaleOrder(models.Model):
         ('phone_call', 'Phone Call'),
     ], string='Order Method', default='onsite')
 
-    def _report_paginated_lines(self, first_page_count=17, other_page_count=25):
+    def _report_paginated_lines(self, first_page_count=22, other_page_count=30):
         self.ensure_one()
 
         lines_to_report = self._get_order_lines_to_report()

@@ -116,15 +116,17 @@
                         <t t-set="printable_lines" t-value="[l for l in lines_to_report if not l.display_type]"/>
                         <t t-set="has_discount_lines" t-value="[l for l in printable_lines if l.discount]"/>
 
-                        <table class="o_has_total_table table o_main_table table-borderless">
+<!--                        <table class="o_has_total_table table o_main_table table-borderless">-->
+                        <table style="border-collapse: collapse; width:100%; margin-bottom:17px;">
                             <thead style="display: table-row-group">
                                 <tr>
-                                    <th class="text-start">Description</th>
-                                    <th class="text-end text-nowrap">Quantity</th>
-                                    <th class="text-end">Dozen/Pieces</th>
-                                    <th class="text-end text-nowrap">Unit Price</th>
-                                    <th t-if="has_discount_lines" class="text-end">Disc.%</th>
-                                    <th class="text-end">Amount</th>
+                                    <th style="border:1px solid black; padding:4px; width:30px" class="text-start">S/L</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-start">Description</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end text-nowrap">Quantity</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end">Dozen/Pieces</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end text-nowrap">Unit Price</th>
+                                    <th style="border:1px solid black; padding:4px;" t-if="has_discount_lines" class="text-end">Disc.%</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end">Amount</th>
                                 </tr>
                             </thead>
                             <tr>
@@ -137,17 +139,22 @@
                                 <t t-set="has_discount_lines" t-value="[l for l in printable_lines if l.discount]"/>
 
                                 <!-- NEW: get paginated pages (17 first, 24 thereafter) -->
-                                <t t-set="pages" t-value="o._report_paginated_lines(17, 25)"/>
+                                <t t-set="pages" t-value="o._report_paginated_lines(22, 30)"/>
                                 <!-- columns count to compute colspan for the Page Subtotal label cell -->
                                 <t t-set="columns" t-value="6 if has_discount_lines else 5"/>
 
+                                <t t-set="sl_no" t-value="0"/>
                                 <!-- Render each page chunk -->
                                 <t t-foreach="pages" t-as="page">
                                     <!-- Render lines of this page -->
-                                    <t t-foreach="page['lines']" t-as="line">
+                                    <t t-foreach="page['lines']" t-as="line" t-foreach-index="l_idx">
                                         <tr>
+                                            <td style="border:1px solid black; padding:4px;" class="text-start">
+                                                <t t-set="sl_no" t-value="sl_no + 1"/>
+                                                <t t-esc="sl_no"/>
+                                            </td>
                                             <!-- Description: first line only -->
-                                            <td name="td_name">
+                                            <td style="border:1px solid black; padding:4px;" name="td_name">
                                                 <!-- First line only -->
                                                 <t t-set="name_first_line" t-value="(line.name or '').split('\n')[0]"/>
                                                 <!-- Crop -->
@@ -162,14 +169,14 @@
                                             </td>
 
                                             <!-- Quantity -->
-                                            <td name="td_quantity"
+                                            <td style="border:1px solid black; padding:4px;" name="td_quantity"
                                                 t-attf-class="text-end {{ 'text-nowrap' if (not line.product_packaging_id or len(line.product_packaging_id.name) &lt; 10) else '' }}">
                                                 <span t-field="line.product_uom_qty"/>
                                                 <span t-field="line.product_uom"/>
                                             </td>
 
                                             <!-- Qty (dozen/pieces) -->
-                                            <td class="text-end">
+                                            <td style="border:1px solid black; padding:4px;" class="text-end">
                                                 <t t-if="line.set_name">
                                                     <span t-field="line.set_name"/>
                                                 </t>
@@ -180,17 +187,17 @@
                                             </td>
 
                                             <!-- Unit Price -->
-                                            <td class="text-end text-nowrap">
+                                            <td style="border:1px solid black; padding:4px;" class="text-end text-nowrap">
                                                 <span t-field="line.price_unit"/>
                                             </td>
 
                                             <!-- Discount (optional column) -->
-                                            <td t-if="has_discount_lines" class="text-end">
+                                            <td style="border:1px solid black; padding:4px;" t-if="has_discount_lines" class="text-end">
                                                 <span t-field="line.discount"/>
                                             </td>
 
                                             <!-- Amount (skip for downpayments) -->
-                                            <td class="text-end o_price_total">
+                                            <td style="border:1px solid black; padding:4px;" class="text-end o_price_total">
                                                 <t t-if="line.price_subtotal">
                                                     <span t-field="line.price_subtotal"/>
                                                 </t>
@@ -199,24 +206,24 @@
                                     </t>
 
                                     <!-- PAGE SUBTOTAL (for this chunk), shown only if not the last page -->
-                                    <tr t-if="page['show_subtotal']" class="o_page_subtotal">
-                                        <td class="text-start" style="border-top:1px solid #000;">
+                                    <tr t-if="page['show_subtotal']" class="o_page_subtotal" >
+                                        <td style="border:1px solid black; padding:4px;"> </td>
+                                        <td style="border:1px solid black; padding:4px;" class="text-start">
                                             <strong>Page Subtotal</strong>
                                         </td>
                                         <!-- Quantity column (empty, just filler) -->
-                                        <td style="border-top:1px solid #000;"> </td>
-
-                                        <td class="text-end" style="border-top:1px solid #000;">
+                                        <td style="border:1px solid black; padding:4px;"> </td>
+                                        <td style="border:1px solid black; padding:4px;" class="text-end">
                                             <!-- Already currency-formatted in Python -->
                                             <strong><span t-esc="page['qty_display']"/></strong>
                                         </td>
                                         <!-- Unit Price column (empty, just filler) -->
-                                        <td style="border-top:1px solid #000;"> </td>
+                                        <td style="border:1px solid black; padding:4px;"> </td>
 
                                         <!-- Discount column (only if exists) -->
-                                        <td t-if="has_discount_lines" style="border-top:1px solid #000;"> </td>
+                                        <td style="border:1px solid black; padding:4px;" t-if="has_discount_lines"> </td>
 
-                                        <td class="text-end" style="border-top:1px solid #000;">
+                                        <td style="border:1px solid black; padding:4px;" class="text-end">
                                             <!-- Already currency-formatted in Python -->
                                             <strong><span t-esc="page['subtotal_display']"/></strong>
                                         </td>
@@ -235,11 +242,6 @@
                             <div id="total" class="row mt-n3" name="total">
                                 <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
                                     <table class="o_total_table table table-borderless">
-                                        <!-- thin line ABOVE the totals area -->
-                                        <tr>
-                                            <td colspan="3" style="border-top: 1px solid #000; height: 1px;"></td>
-                                        </tr>
-
                                         <!-- sum raw page qtys (include last page because we keep qty_dz/qty_pc everywhere) -->
                                         <t t-set="grand_dz_raw" t-value="sum([p.get('qty_dz', 0) for p in pages])"/>
                                         <t t-set="grand_pc_raw" t-value="sum([p.get('qty_pc', 0) for p in pages])"/>
