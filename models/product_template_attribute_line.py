@@ -35,7 +35,7 @@ class ProductTemplateAttributeLine(models.Model):
                     remote_line_ids = remote_models.execute_kw(
                         db, uid, password, 'product.template.attribute.line', 'search',
                         [[['product_tmpl_id', '=', line.product_tmpl_id.related_product_id],
-                          ['attribute_id', '=', line.attribute_id.id]]]
+                          ['attribute_id', '=', line.attribute_id.related_attribute_id.id]]]
                     )
                     # If found, unlink it
                     if remote_line_ids:

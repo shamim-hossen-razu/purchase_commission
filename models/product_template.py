@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import xmlrpc.client
+from copy import deepcopy
 
 
 class ProductTemplate(models.Model):
@@ -82,8 +83,21 @@ class ProductTemplate(models.Model):
                 uid = config['uid']
                 password = config['password']
                 models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+                if vals.get('variant_seller_ids', False):
+                    copied_vals = deepcopy(vals)
+                    for i, seller_data in enumerate(copied_vals['variant_seller_ids']):
+                        if isinstance(seller_data[2], dict):
+                            partner_id = seller_data[2].get('partner_id', False)
+                            if partner_id:
+                                partner = self.env['res.partner'].browse(partner_id)
+                                if partner.related_partner_id:
+                                    copied_vals['variant_seller_ids'][i][2]['partner_id'] = partner.related_partner_id
 
-                models_rpc.execute_kw(db, uid, password, 'product.template', 'write', [[rec.related_product_id], vals])
+                    models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
+                                          [[rec.related_product_id], copied_vals])
+                else:
+                    models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
+                                          [[rec.related_product_id], vals])
         return super(ProductTemplate, self).write(vals)
 
     def unlink(self):

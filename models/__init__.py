@@ -16,6 +16,7 @@ from . import partner_address
 from . import company_address
 from . import product_template_attribute_line
 from . import product_supplierinfo
+from . import product_attribute
 
 
 
