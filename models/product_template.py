@@ -58,8 +58,20 @@ class ProductTemplate(models.Model):
                                                         [[['name', '=ilike', vals.get('name')]]])
             if not existing_records:
                 # No existing record found, create a new one in the remote DB
-                vals['related_product_id'] = remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
-        return super(ProductTemplate, self).create(vals_list)
+                remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
+
+        new_products = super(ProductTemplate, self).create(vals_list)
+        for product in new_products:
+            if not product.related_product_id:
+                # find related record id from remote db
+                remote_record = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
+                                                         [[['name', '=', product.name]]], {'limit': 1})
+                # write related partner id from main  database to remote record
+                remote_models.execute_kw(db, uid, password, 'product.template', 'write',
+                                         [remote_record, {'related_product_id': product.id}])
+                # write related partner id from remote database to main record
+                product.write({'related_product_id': remote_record[0] if remote_record else False})
+        return new_products
 
     def write(self, vals):
         for rec in self:
