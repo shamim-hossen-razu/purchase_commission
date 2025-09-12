@@ -1,7 +1,8 @@
 from odoo import models, fields, api
 import xmlrpc.client
 from odoo.exceptions import ValidationError
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class ProductAttribute(models.Model):
     _inherit = 'product.attribute'
@@ -31,36 +32,88 @@ class ProductAttribute(models.Model):
         if single_record:
             vals_list = [vals_list]
 
-        remote_models = db = uid = password = None
         if self._db_sync_enabled():
-            config = self._get_external_config()
-            url = config['url']
-            db = config['db']
-            uid = config['uid']
-            password = config['password']
-            remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+            try:
+                config = self._get_external_config()
+                if not config or not all(config.get(k) for k in ['url', 'db', 'uid', 'password']):
+                    _logger.warning("External DB config is incomplete, skipping sync")
+                    return super(ProductAttribute, self).create(vals_list)
 
-        # Process each record
-        for vals in vals_list:
-            # Check for existing product by name (case-insensitive) in remote DB
-            existing_records = remote_models.execute_kw(db, uid, password, 'product.attribute', 'search',
-                                                        [[['name', '=ilike', vals.get('name')]]])
-            if not existing_records:
-                # No existing record found, create a new one in the remote DB
-                remote_models.execute_kw(db, uid, password, 'product.attribute', 'create', [vals])
+                url = config['url']
+                db = config['db']
+                uid = config['uid']
+                password = config['password']
 
-        new_attributes = super(ProductAttribute, self).create(vals_list)
-        for attribute in new_attributes:
-            if not attribute.related_attribute_id:
-                # find related record id from remote db
-                remote_record = remote_models.execute_kw(db, uid, password, 'product.attribute', 'search',
-                                                         [[['name', '=', attribute.name]]], {'limit': 1})
-                # write related partner id from main  database to remote record
-                remote_models.execute_kw(db, uid, password, 'product.attribute', 'write',
-                                         [remote_record, {'related_attribute_id': attribute.id}])
-                # write related partner id from remote database to main record
-                attribute.write({'related_attribute_id': remote_record[0] if remote_record else False})
-        return new_attributes
+                # Create XML-RPC connection
+                remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+
+                # Test the connection with a simple call
+                try:
+                    remote_models.execute_kw(db, uid, password, 'product.attribute', 'check_access_rights', ['read'])
+                except Exception as e:
+                    _logger.error(f"Failed to connect to remote DB: {e}")
+                    return super(ProductAttribute, self).create(vals_list)
+
+                # Process each record
+                for vals in vals_list:
+                    try:
+                        # Check for existing product by name (case-insensitive) in remote DB
+                        existing_records = remote_models.execute_kw(
+                            db, uid, password,
+                            'product.attribute', 'search',
+                            [[['name', '=ilike', vals.get('name')]]]
+                        )
+
+                        if not existing_records:
+                            # No existing record found, create a new one in the remote DB
+                            remote_models.execute_kw(
+                                db, uid, password,
+                                'product.attribute', 'create',
+                                [vals]
+                            )
+                    except Exception as e:
+                        _logger.error(f"Error processing remote record for {vals.get('name', 'Unknown')}: {e}")
+                        continue
+
+                # Create records in local DB
+                new_attributes = super(ProductAttribute, self).create(vals_list)
+
+                # Update relationships
+                for attribute in new_attributes:
+                    if not attribute.related_attribute_id:
+                        try:
+                            # Find related record id from remote db
+                            remote_record = remote_models.execute_kw(
+                                db, uid, password,
+                                'product.attribute', 'search',
+                                [[['name', '=', attribute.name]]],
+                                {'limit': 1}
+                            )
+
+                            if remote_record:
+                                # Write related partner id from main database to remote record
+                                remote_models.execute_kw(
+                                    db, uid, password,
+                                    'product.attribute', 'write',
+                                    [remote_record, {'related_attribute_id': attribute.id}]
+                                )
+
+                                # Write related partner id from remote database to main record
+                                attribute.write({'related_attribute_id': remote_record[0]})
+
+                        except Exception as e:
+                            _logger.error(f"Error updating relationships for {attribute.name}: {e}")
+                            continue
+
+                return new_attributes
+
+            except Exception as e:
+                _logger.error(f"Error in external DB sync: {e}")
+                # Fall back to normal creation if external sync fails
+                return super(ProductAttribute, self).create(vals_list)
+        else:
+            return super(ProductAttribute, self).create(vals_list)
+
 
     def write(self, vals):
         for record in self:
