@@ -52,27 +52,29 @@ class ProductTemplate(models.Model):
             password = config['password']
             remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
 
-        # Process each record
-        for vals in vals_list:
-            # Check for existing product by name (case-insensitive) in remote DB
-            existing_records = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
-                                                        [[['name', '=ilike', vals.get('name')]]])
-            if not existing_records:
-                # No existing record found, create a new one in the remote DB
-                remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
+            # Process each record
+            for vals in vals_list:
+                # Check for existing product by name (case-insensitive) in remote DB
+                existing_records = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
+                                                            [[['name', '=ilike', vals.get('name')]]])
+                if not existing_records:
+                    # No existing record found, create a new one in the remote DB
+                    remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
 
-        new_products = super(ProductTemplate, self).create(vals_list)
-        for product in new_products:
-            if not product.related_product_id:
-                # find related record id from remote db
-                remote_record = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
-                                                         [[['name', '=', product.name]]], {'limit': 1})
-                # write related partner id from main  database to remote record
-                remote_models.execute_kw(db, uid, password, 'product.template', 'write',
-                                         [remote_record, {'related_product_id': product.id}])
-                # write related partner id from remote database to main record
-                product.write({'related_product_id': remote_record[0] if remote_record else False})
-        return new_products
+            new_products = super(ProductTemplate, self).create(vals_list)
+            for product in new_products:
+                if not product.related_product_id:
+                    # find related record id from remote db
+                    remote_record = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
+                                                             [[['name', '=', product.name]]], {'limit': 1})
+                    # write related partner id from main  database to remote record
+                    remote_models.execute_kw(db, uid, password, 'product.template', 'write',
+                                             [remote_record, {'related_product_id': product.id}])
+                    # write related partner id from remote database to main record
+                    product.write({'related_product_id': remote_record[0] if remote_record else False})
+            return new_products
+        else:
+            return super(ProductTemplate, self).create(vals_list)
 
     def write(self, vals):
         for rec in self:
