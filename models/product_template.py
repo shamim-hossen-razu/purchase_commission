@@ -82,6 +82,9 @@ class ProductTemplate(models.Model):
                     # write related partner id from remote database to main record
                     product.write({'related_product_id': remote_record[0] if remote_record else False})
             return new_products
+        else:
+            _logger.info("Data sync not enabled; skipping external DB operation.")
+            return super(ProductTemplate, self).create(vals_list)
 
     def write(self, vals):
         for rec in self:
