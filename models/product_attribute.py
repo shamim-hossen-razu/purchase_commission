@@ -4,6 +4,7 @@ from odoo.exceptions import ValidationError
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class ProductAttribute(models.Model):
     _inherit = 'product.attribute'
 
@@ -45,16 +46,12 @@ class ProductAttribute(models.Model):
                 password = config['password']
 
                 # Create XML-RPC connection
-                remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
-
-                # Test the connection with a simple call
                 try:
-                    remote_models.execute_kw(db, uid, password, 'product.attribute', 'check_access_rights', ['read'])
+                    remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
                 except Exception as e:
-                    _logger.error(f"Failed to connect to remote DB: {e}")
+                    _logger.error(f"Failed to connect to external server: {e}")
                     return super(ProductAttribute, self).create(vals_list)
-
-                # Process each record
+                # create attribute with same name in remote databae
                 for vals in vals_list:
                     try:
                         # Check for existing product by name (case-insensitive) in remote DB
@@ -65,6 +62,7 @@ class ProductAttribute(models.Model):
                         )
 
                         if not existing_records:
+                            _logger.info(f"Creating new remote record for attribute: {vals.get('name', 'Unknown')}")
                             # No existing record found, create a new one in the remote DB
                             remote_models.execute_kw(
                                 db, uid, password,
@@ -75,7 +73,7 @@ class ProductAttribute(models.Model):
                         _logger.error(f"Error processing remote record for {vals.get('name', 'Unknown')}: {e}")
                         continue
 
-                # Create records in local DB
+                # Create attributes in main database
                 new_attributes = super(ProductAttribute, self).create(vals_list)
 
                 # Update relationships
@@ -113,7 +111,6 @@ class ProductAttribute(models.Model):
                 return super(ProductAttribute, self).create(vals_list)
         else:
             return super(ProductAttribute, self).create(vals_list)
-
 
     def write(self, vals):
         for record in self:
