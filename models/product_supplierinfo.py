@@ -1,5 +1,7 @@
 from odoo import models, fields, api
 import xmlrpc.client
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class ProductSupplierinfo(models.Model):
@@ -37,10 +39,13 @@ class ProductSupplierinfo(models.Model):
                         [[['product_tmpl_id', '=', line.product_tmpl_id.related_product_id],
                           ['partner_id', '=', line.partner_id.related_partner_id]]]
                     )
+                    _logger.warning(f"Remote line IDs to unlink: {remote_line_ids}")
                     # If found, unlink it
                     if remote_line_ids:
                         remote_models.execute_kw(
                             db, uid, password, 'product.supplierinfo', 'unlink',
                             [remote_line_ids]
                         )
-        return super(ProductSupplierinfo, self).unlink()
+            return super(ProductSupplierinfo, self).unlink()
+        else:
+            return super(ProductSupplierinfo, self).unlink()
