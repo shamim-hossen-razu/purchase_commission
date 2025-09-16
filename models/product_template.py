@@ -100,24 +100,15 @@ class ProductTemplate(models.Model):
                 except Exception as e:
                     raise ValidationError(f"Failed to connect to external server: {e}")
                 if vals.get('seller_ids', False):
-                    copied_vals = deepcopy(vals)
-                    for i, seller_data in enumerate(copied_vals['seller_ids']):
-                        if isinstance(seller_data[2], dict):
-                            partner_id = seller_data[2].get('partner_id', False)
-                            if partner_id:
-                                partner = self.env['res.partner'].browse(partner_id)
-                                if partner.related_partner_id:
-                                    copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
-
+                    vals.pop('seller_ids')
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
-                                          [[rec.related_product_id], copied_vals])
-                    return super(ProductTemplate, self).write(vals)
-
+                                          [[rec.related_product_id], vals])
                 else:
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], vals])
-                    return super(ProductTemplate, self).write(vals)
+                return super(ProductTemplate, self).write(vals)
             else:
+                _logger.info(vals)
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
                 return super(ProductTemplate, self).write(vals)
 
