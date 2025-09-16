@@ -32,7 +32,7 @@ class ResCompany(models.Model):
     )
 
     def _compute_bd_format_address(self):
-        param = self.env['ir.config_parameter'].sudo().get_param('bangladesh_geocode.bd_format_address',
+        param = self.env['ir.config_parameter'].sudo().get_param('purchase_commission.bd_format_address',
                                                                  default='False')
         for record in self:
             record.bd_format_address = param == 'True'
