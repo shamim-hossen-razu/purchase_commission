@@ -66,7 +66,18 @@ class ProductTemplate(models.Model):
                                                                 [[['name', '=ilike', vals.get('name')]]])
                     if not existing_records:
                         # No existing record found, create a new one in the remote DB
-                        remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
+                        if vals.get('seller_ids', False):
+                            copied_vals = deepcopy(vals)
+                            for i, seller_data in enumerate(copied_vals['seller_ids']):
+                                if isinstance(seller_data[2], dict):
+                                    partner_id = seller_data[2].get('partner_id', False)
+                                    if partner_id:
+                                        partner = self.env['res.partner'].browse(partner_id)
+                                        if partner.related_partner_id:
+                                            copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
+                            remote_models.execute_kw(db, uid, password, 'product.template', 'create', [copied_vals])
+                        else:
+                            remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
                 except Exception as e:
                     raise ValidationError(f"Error during creating product in remote database: {e}")
             # Create the records in main database
@@ -100,9 +111,18 @@ class ProductTemplate(models.Model):
                 except Exception as e:
                     raise ValidationError(f"Failed to connect to external server: {e}")
                 if vals.get('seller_ids', False):
-                    vals.pop('seller_ids')
+                    copied_vals = deepcopy(vals)
+                    for i, seller_data in enumerate(copied_vals['seller_ids']):
+                        if isinstance(seller_data[2], dict):
+                            partner_id = seller_data[2].get('partner_id', False)
+                            if partner_id:
+                                partner = self.env['res.partner'].browse(partner_id)
+                                if partner.related_partner_id:
+                                    copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
+
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
-                                          [[rec.related_product_id], vals])
+                                          [[rec.related_product_id], copied_vals])
+                    return super(ProductTemplate, self).write(vals)
                 else:
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], vals])
