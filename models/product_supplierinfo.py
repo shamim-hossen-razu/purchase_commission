@@ -11,8 +11,7 @@ class ProductSupplierinfo(models.Model):
     related_supplierinfo_id = fields.Integer(string='Related Supplier Info ID',
                                               help='ID of the related supplier info in the external system')
 
-
-    @api.constraints('partner_id', 'product_tmpl_id')
+    @api.constrains('partner_id', 'product_tmpl_id')
     def _check_unique_supplierinfo(self):
         """Ensure unique supplierinfo per product-partner pair (case-insensitive) locally"""
         for info in self:
