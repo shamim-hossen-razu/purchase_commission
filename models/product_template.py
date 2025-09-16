@@ -44,7 +44,6 @@ class ProductTemplate(models.Model):
         single_record = isinstance(vals_list, dict)
         if single_record:
             vals_list = [vals_list]
-
         if self._db_sync_enabled():
             _logger.info("Data sync is enabled. Proceeding with external DB operations.")
             config = self._get_external_config()
@@ -69,7 +68,7 @@ class ProductTemplate(models.Model):
                         if vals.get('seller_ids', False):
                             copied_vals = deepcopy(vals)
                             for i, seller_data in enumerate(copied_vals['seller_ids']):
-                                if isinstance(seller_data[2], dict):
+                                if len(seller_data) > 2 and isinstance(seller_data[2], dict):
                                     partner_id = seller_data[2].get('partner_id', False)
                                     if partner_id:
                                         partner = self.env['res.partner'].browse(partner_id)
@@ -87,9 +86,11 @@ class ProductTemplate(models.Model):
                     # find related record id from remote db
                     remote_record = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
                                                              [[['name', '=', product.name]]], {'limit': 1})
+
                     # write related partner id from main  database to remote record
                     remote_models.execute_kw(db, uid, password, 'product.template', 'write',
                                              [remote_record, {'related_product_id': product.id}])
+
                     # write related partner id from remote database to main record
                     product.write({'related_product_id': remote_record[0] if remote_record else False})
             return new_products
@@ -113,13 +114,36 @@ class ProductTemplate(models.Model):
                 if vals.get('seller_ids', False):
                     copied_vals = deepcopy(vals)
                     for i, seller_data in enumerate(copied_vals['seller_ids']):
-                        if isinstance(seller_data[2], dict):
+                        _logger.info(f"Processing seller_data: {seller_data}")
+                        if len(seller_data) > 2 and seller_data[0] == 0 and isinstance(seller_data[2], dict):
                             partner_id = seller_data[2].get('partner_id', False)
                             if partner_id:
                                 partner = self.env['res.partner'].browse(partner_id)
                                 if partner.related_partner_id:
                                     copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
-
+                        if len(seller_data) > 2 and seller_data[0] == 1 and isinstance(seller_data[2], dict):
+                            main_db_supplier_info_id = seller_data[1]
+                            main_supplier_info = self.env['product.supplierinfo'].browse(main_db_supplier_info_id)
+                            main_supplier_tmpl_id = main_supplier_info.product_tmpl_id.id
+                            main_supplier_related_partner_id = main_supplier_info.partner_id.id
+                            if main_supplier_tmpl_id and main_supplier_related_partner_id:
+                                related_product_id = self.env['product.template'].browse(main_supplier_tmpl_id).related_product_id
+                                related_partner_id = self.env['res.partner'].browse(main_supplier_related_partner_id).related_partner_id
+                                if related_product_id and related_partner_id:
+                                    remote_supplier_info_ids = models_rpc.execute_kw(
+                                        db, uid, password, 'product.supplierinfo', 'search',
+                                        [[['product_tmpl_id', '=', related_product_id],
+                                          ['partner_id', '=', related_partner_id]]]
+                                    )
+                                    if remote_supplier_info_ids:
+                                        copied_vals['seller_ids'][i][1] = remote_supplier_info_ids[0]
+                                    else:
+                                        raise ValidationError(f"Related supplier info not found in remote DB for product_tmpl_id {related_product_id} and partner_id {related_partner_id}")
+                                else:
+                                    raise ValidationError("Related product or partner ID not found for supplier info update.")
+                            pass
+                        else:
+                            copied_vals.pop('seller_ids', None)
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], copied_vals])
                     return super(ProductTemplate, self).write(vals)
