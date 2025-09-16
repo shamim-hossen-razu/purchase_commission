@@ -99,15 +99,15 @@ class ProductTemplate(models.Model):
                     models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
                 except Exception as e:
                     raise ValidationError(f"Failed to connect to external server: {e}")
-                if vals.get('variant_seller_ids', False):
+                if vals.get('seller_ids', False):
                     copied_vals = deepcopy(vals)
-                    for i, seller_data in enumerate(copied_vals['variant_seller_ids']):
+                    for i, seller_data in enumerate(copied_vals['seller_ids']):
                         if isinstance(seller_data[2], dict):
                             partner_id = seller_data[2].get('partner_id', False)
                             if partner_id:
                                 partner = self.env['res.partner'].browse(partner_id)
                                 if partner.related_partner_id:
-                                    copied_vals['variant_seller_ids'][i][2]['partner_id'] = partner.related_partner_id
+                                    copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
 
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], copied_vals])
