@@ -2,6 +2,8 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import xmlrpc.client
 from copy import deepcopy
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class ProductTemplate(models.Model):
@@ -43,36 +45,43 @@ class ProductTemplate(models.Model):
         if single_record:
             vals_list = [vals_list]
 
-        remote_models = db = uid = password = None
         if self._db_sync_enabled():
+            _logger.info("Data sync is enabled. Proceeding with external DB operations.")
             config = self._get_external_config()
             url = config['url']
             db = config['db']
             uid = config['uid']
             password = config['password']
-            remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+            try:
+                _logger.info(f"Connecting to external server at {url}")
+                remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+            except Exception as e:
+                raise ValidationError(f"Failed to connect to external server: {e}")
 
-        # Process each record
-        for vals in vals_list:
-            # Check for existing product by name (case-insensitive) in remote DB
-            existing_records = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
-                                                        [[['name', '=ilike', vals.get('name')]]])
-            if not existing_records:
-                # No existing record found, create a new one in the remote DB
-                remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
-
-        new_products = super(ProductTemplate, self).create(vals_list)
-        for product in new_products:
-            if not product.related_product_id:
-                # find related record id from remote db
-                remote_record = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
-                                                         [[['name', '=', product.name]]], {'limit': 1})
-                # write related partner id from main  database to remote record
-                remote_models.execute_kw(db, uid, password, 'product.template', 'write',
-                                         [remote_record, {'related_product_id': product.id}])
-                # write related partner id from remote database to main record
-                product.write({'related_product_id': remote_record[0] if remote_record else False})
-        return new_products
+            # Process each record
+            for vals in vals_list:
+                # Check for existing product by name (case-insensitive) in remote DB
+                try:
+                    existing_records = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
+                                                                [[['name', '=ilike', vals.get('name')]]])
+                    if not existing_records:
+                        # No existing record found, create a new one in the remote DB
+                        remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
+                except Exception as e:
+                    raise ValidationError(f"Error during creating product in remote database: {e}")
+            # Create the records in main database
+            new_products = super(ProductTemplate, self).create(vals_list)
+            for product in new_products:
+                if not product.related_product_id:
+                    # find related record id from remote db
+                    remote_record = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
+                                                             [[['name', '=', product.name]]], {'limit': 1})
+                    # write related partner id from main  database to remote record
+                    remote_models.execute_kw(db, uid, password, 'product.template', 'write',
+                                             [remote_record, {'related_product_id': product.id}])
+                    # write related partner id from remote database to main record
+                    product.write({'related_product_id': remote_record[0] if remote_record else False})
+            return new_products
 
     def write(self, vals):
         for rec in self:
@@ -82,7 +91,11 @@ class ProductTemplate(models.Model):
                 db = config['db']
                 uid = config['uid']
                 password = config['password']
-                models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+                try:
+                    _logger.info(f"Connecting to external server at {url} for write operation")
+                    models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+                except Exception as e:
+                    raise ValidationError(f"Failed to connect to external server: {e}")
                 if vals.get('variant_seller_ids', False):
                     copied_vals = deepcopy(vals)
                     for i, seller_data in enumerate(copied_vals['variant_seller_ids']):
@@ -95,10 +108,15 @@ class ProductTemplate(models.Model):
 
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], copied_vals])
+                    return super(ProductTemplate, self).write(vals)
+
                 else:
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], vals])
-        return super(ProductTemplate, self).write(vals)
+                    return super(ProductTemplate, self).write(vals)
+            else:
+                _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
+                return super(ProductTemplate, self).write(vals)
 
     def unlink(self):
         """Override unlink to delete the product.template in external DB as well"""
