@@ -205,17 +205,22 @@ class ProductTemplate(models.Model):
                             copied_vals.pop('seller_ids', None)
                             models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                                   [[rec.related_product_id], copied_vals])
+                    if vals.get('combo_ids', False):
+                        vals['combo_ids'] = [
+                            (0, combo[1], combo[2]) if combo[0] == Command.CLEAR else combo
+                            for combo in vals['combo_ids']
+                        ]
                     return super(ProductTemplate, self).write(vals)
                 else:
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], vals])
                     return super(ProductTemplate, self).write(vals)
             else:
-                vals = dict(vals)
-
-                if "combo_ids" in vals and isinstance(vals["combo_ids"], (list, tuple)):
-                    vals["combo_ids"] = _normalize_x2many_for_rpc(vals["combo_ids"])
-                    _logger.info("combo_ids normalized for RPC: %s", vals["combo_ids"])
+                # vals = dict(vals)
+                #
+                # if "combo_ids" in vals and isinstance(vals["combo_ids"], (list, tuple)):
+                #     vals["combo_ids"] = _normalize_x2many_for_rpc(vals["combo_ids"])
+                #     _logger.info("combo_ids normalized for RPC: %s", vals["combo_ids"])
 
                 _logger.info(vals)
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
