@@ -37,7 +37,6 @@ class ProductTemplate(models.Model):
         ICP = self.env['ir.config_parameter'].sudo()
         return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
 
-    @api.model
     def create(self, vals_list):
         """Handle both single and multiple record creation during import"""
         # Ensure vals_list is always a list for consistency
@@ -111,16 +110,19 @@ class ProductTemplate(models.Model):
                     models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
                 except Exception as e:
                     raise ValidationError(f"Failed to connect to external server: {e}")
+                # handle case when vendors are added in product template
                 if vals.get('seller_ids', False):
                     copied_vals = deepcopy(vals)
                     for i, seller_data in enumerate(copied_vals['seller_ids']):
                         _logger.info(f"Processing seller_data: {seller_data}")
+                        # Handle case when vendors are being added at the time of creating product template
                         if len(seller_data) > 2 and seller_data[0] == 0 and isinstance(seller_data[2], dict):
                             partner_id = seller_data[2].get('partner_id', False)
                             if partner_id:
                                 partner = self.env['res.partner'].browse(partner_id)
                                 if partner.related_partner_id:
                                     copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
+                        # Handle case when vendor line is being edited
                         if len(seller_data) > 2 and seller_data[0] == 1 and isinstance(seller_data[2], dict):
                             main_db_supplier_info_id = seller_data[1]
                             main_supplier_info = self.env['product.supplierinfo'].browse(main_db_supplier_info_id)
@@ -141,7 +143,6 @@ class ProductTemplate(models.Model):
                                         raise ValidationError(f"Related supplier info not found in remote DB for product_tmpl_id {related_product_id} and partner_id {related_partner_id}")
                                 else:
                                     raise ValidationError("Related product or partner ID not found for supplier info update.")
-                            pass
                         else:
                             copied_vals.pop('seller_ids', None)
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
@@ -152,7 +153,9 @@ class ProductTemplate(models.Model):
                                           [[rec.related_product_id], vals])
                 return super(ProductTemplate, self).write(vals)
             else:
+                vals.pop('combo_ids', None)
                 _logger.info(vals)
+
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
                 return super(ProductTemplate, self).write(vals)
 

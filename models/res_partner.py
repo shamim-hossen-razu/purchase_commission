@@ -15,7 +15,7 @@ class ResPartner(models.Model):
     related_partner_id = fields.Integer(string='Related Partner ID')
 
     commission_count = fields.Integer(compute='_compute_commission_count', string='Commission Count')
-    mobile = fields.Char(string='Mobile', help='Mobile number in format +880 XXXX-XXXXXX', required=True)
+    # mobile = fields.Char(string='Mobile', help='Mobile number in format +880 XXXX-XXXXXX')
 
     def _compute_commission_count(self):
         for partner in self:
@@ -63,7 +63,6 @@ class ResPartner(models.Model):
         ICP = self.env['ir.config_parameter'].sudo()
         return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
 
-    @api.model
     def create(self, vals_list):
         """Handle both single and multiple record creation during import"""
         # Ensure vals_list is always a list for consistency
