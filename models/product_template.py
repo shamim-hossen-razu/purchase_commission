@@ -4,6 +4,59 @@ import xmlrpc.client
 from copy import deepcopy
 import logging
 _logger = logging.getLogger(__name__)
+import enum
+from odoo.fields import Command
+
+
+def _normalize_x2many_for_rpc(cmds):
+    """Return a list of XML-RPC-safe tuples for an x2many update."""
+    out = []
+    for c in (cmds or []):
+        # Case A: real Command object (new API)
+        if isinstance(c, Command) or getattr(c, "command", None):
+            cmd = getattr(c, "command", c)
+            if cmd == Command.CREATE:
+                out.append((0, 0, dict(getattr(c, "values", {}) or {})))
+            elif cmd == Command.UPDATE:
+                out.append((1, int(getattr(c, "id", 0)), dict(getattr(c, "values", {}) or {})))
+            elif cmd == Command.DELETE:
+                out.append((2, int(getattr(c, "id", 0))))
+            elif cmd == Command.UNLINK:
+                out.append((3, int(getattr(c, "id", 0))))
+            elif cmd == Command.LINK:
+                out.append((4, int(getattr(c, "id", 0)), 0))
+            elif cmd == Command.CLEAR:
+                out.append((5,))  # canonical: just (5,)
+            elif cmd == Command.SET:
+                ids = list(getattr(c, "ids", []) or [])
+                out.append((6, 0, ids))
+            else:
+                # Fallback: stringify to avoid marshaling errors (shouldn't happen)
+                out.append(str(c))
+            continue
+
+        # Case B: you received a tuple whose first element is an Enum (your log)
+        if isinstance(c, tuple) and c and isinstance(c[0], enum.Enum) and c[0].__class__.__name__ == "Command":
+            enum_cmd = c[0]
+            if enum_cmd == Command.CREATE:
+                out.append((0, 0, (c[2] if len(c) > 2 else {}) or {}))
+            elif enum_cmd == Command.UPDATE:
+                out.append((1, int(c[1]) if len(c) > 1 else 0, (c[2] if len(c) > 2 else {}) or {}))
+            elif enum_cmd == Command.DELETE:
+                out.append((2, int(c[1]) if len(c) > 1 else 0))
+            elif enum_cmd == Command.UNLINK:
+                out.append((3, int(c[1]) if len(c) > 1 else 0))
+            elif enum_cmd == Command.LINK:
+                out.append((4, int(c[1]) if len(c) > 1 else 0, 0))
+            elif enum_cmd == Command.CLEAR:
+                out.append((5,))  # normalize (Command.CLEAR, 0, 0) -> (5,)
+            elif enum_cmd == Command.SET:
+                out.append((6, 0, list(c[2] if len(c) > 2 else []) ))
+            continue
+
+        # Case C: already a classic tuple or plain id — pass through
+        out.append(c)
+    return out
 
 
 class ProductTemplate(models.Model):
@@ -158,6 +211,12 @@ class ProductTemplate(models.Model):
                                           [[rec.related_product_id], vals])
                     return super(ProductTemplate, self).write(vals)
             else:
+                vals = dict(vals)
+
+                if "combo_ids" in vals and isinstance(vals["combo_ids"], (list, tuple)):
+                    vals["combo_ids"] = _normalize_x2many_for_rpc(vals["combo_ids"])
+                    _logger.info("combo_ids normalized for RPC: %s", vals["combo_ids"])
+
                 _logger.info(vals)
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
                 return super(ProductTemplate, self).write(vals)
