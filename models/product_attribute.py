@@ -101,9 +101,8 @@ class ProductAttribute(models.Model):
                                 {'limit': 1}
                             )
                             _logger.info(f"Linking local attribute '{attribute.name}' with remote ID {remote_record}")
-                            print('Linking local attribute', attribute.name, 'with remote ID', remote_record)
                             if remote_record:
-                                print('Remote record found', remote_record)
+                                _logger.info(f"Linking local attribute '{attribute.name}' with remote ID {remote_record[0]}")
                                 # Write related partner id from main database to remote record
                                 remote_models.execute_kw(
                                     db, uid, password,
@@ -142,10 +141,21 @@ class ProductAttribute(models.Model):
                 if vals.get('value_ids'):
                     copied_vals = deepcopy(vals)
                     for i, value_data in enumerate(copied_vals['value_ids']):
-                        if len(value_data) > 2 and isinstance(value_data[2], dict):
-                            print('hello')
-                            print('hello')
-                            print('hello')
+                        # Handle case when vendor line is being edited
+                        if len(value_data) > 2 and value_data[0] == 1 and isinstance(value_data[2], dict):
+                            main_db_attribute_value_id = value_data[1]
+                            main_db_attribute_value = self.env['product.attribute.value'].browse(
+                                main_db_attribute_value_id)
+                            # search on remote db main_db_attribute_value name
+                            remote_db_attribute_value_id = remote_models.execute_kw(db, uid, password,
+                                                                                    'product.attribute.value', 'search',
+                                                                                    [[['name', '=ilike',
+                                                                                       main_db_attribute_value.name]]])
+                            value_data[1] = remote_db_attribute_value_id[0] if remote_db_attribute_value_id else False
+
+                        # Handle case when vendors are being added newly
+                        if len(value_data) > 2 and value_data[0] == 0 and isinstance(value_data[2], dict):
+                            value_data[2]['attribute_id'] = record.remote_attribute_id
                     remote_models.execute_kw(db, uid, password, 'product.attribute', 'write', [remote_record, copied_vals])
                 else:
                     remote_models.execute_kw(db, uid, password, 'product.attribute', 'write', [remote_record, vals])
