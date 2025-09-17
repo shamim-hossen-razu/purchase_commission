@@ -37,6 +37,7 @@ class ProductTemplate(models.Model):
         ICP = self.env['ir.config_parameter'].sudo()
         return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
 
+    @api.model
     def create(self, vals_list):
         """Handle both single and multiple record creation during import"""
         # Ensure vals_list is always a list for consistency

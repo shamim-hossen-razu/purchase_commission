@@ -36,6 +36,7 @@ class ProductAttribute(models.Model):
         ICP = self.env['ir.config_parameter'].sudo()
         return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
 
+    @api.model
     def create(self, vals_list):
         """Handle both single and multiple record creation during import"""
         # Ensure vals_list is always a list for consistency
@@ -74,14 +75,15 @@ class ProductAttribute(models.Model):
                         if not existing_records:
                             _logger.info(f"Creating new remote record for attribute: {vals.get('name', 'Unknown')}")
                             # No existing record found, create a new one in the remote DB
-                            remote_models.execute_kw(
+
+                            remote_record = remote_models.execute_kw(
                                 db, uid, password,
                                 'product.attribute', 'create',
                                 [vals]
                             )
+                            print('Remote record created', remote_record)
                     except Exception as e:
                         _logger.error(f"Error processing remote record for {vals.get('name', 'Unknown')}: {e}")
-                        continue
 
                 # Create attributes in main database
                 new_attributes = super(ProductAttribute, self).create(vals_list)
@@ -120,6 +122,7 @@ class ProductAttribute(models.Model):
                 # Fall back to normal creation if external sync fails
                 return super(ProductAttribute, self).create(vals_list)
         else:
+            _logger.info('Data sync disabled, creating locally only')
             return super(ProductAttribute, self).create(vals_list)
 
     def write(self, vals):
@@ -163,15 +166,15 @@ class ProductAttribute(models.Model):
                         )
         return super(ProductAttribute, self).unlink()
 
-    @api.constrains('name')
-    def _check_unique_name(self):
-        """Ensure product name is unique (case-insensitive) locally"""
-        for product in self:
-            if product.name:
-                existing = self.env['product.attribute'].search(
-                    [('id', '!=', product.id), ('name', '=ilike', product.name)])
-                if existing:
-                    raise ValidationError("A product with the same name already exists.")
+    # @api.constrains('name')
+    # def _check_unique_name(self):
+    #     """Ensure product name is unique (case-insensitive) locally"""
+    #     for product in self:
+    #         if product.name:
+    #             existing = self.env['product.attribute'].search(
+    #                 [('id', '!=', product.id), ('name', '=ilike', product.name)])
+    #             if existing:
+    #                 raise ValidationError("A product with the same name already exists.")
 
 
 
