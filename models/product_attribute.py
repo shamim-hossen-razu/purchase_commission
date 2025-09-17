@@ -8,9 +8,20 @@ _logger = logging.getLogger(__name__)
 class ProductAttribute(models.Model):
     _inherit = 'product.attribute'
 
-    related_attribute_id = fields.Integer(string='Related Attribute ID',
-                                          help='ID of the related attribute in the external system')
+    remote_attribute_id = fields.Integer(string='Remote Attribute ID',
+                                          help='ID of the related attribute in the external system',
+                                         readonly=True)
 
+    @api.constrains('name')
+    def _check_unique_name(self):
+        """Ensure attribute name is unique (case-insensitive) locally"""
+        for attribute in self:
+            if attribute.name:
+                existing = self.env['product.attribute'].search(
+                    [('id', '!=', attribute.id), ('name', '=ilike', attribute.name)])
+                if existing:
+                    raise ValidationError("An attribute with the same name already exists.")
+        
     def _get_external_config(self):
         ICP = self.env['ir.config_parameter'].sudo()
         return {
@@ -77,7 +88,7 @@ class ProductAttribute(models.Model):
 
                 # Update relationships
                 for attribute in new_attributes:
-                    if not attribute.related_attribute_id:
+                    if not attribute.remote_attribute_id:
                         try:
                             # Find related record id from remote db
                             remote_record = remote_models.execute_kw(
@@ -92,11 +103,11 @@ class ProductAttribute(models.Model):
                                 remote_models.execute_kw(
                                     db, uid, password,
                                     'product.attribute', 'write',
-                                    [remote_record, {'related_attribute_id': attribute.id}]
+                                    [remote_record, {'remote_attribute_id': attribute.id}]
                                 )
 
                                 # Write related partner id from remote database to main record
-                                attribute.write({'related_attribute_id': remote_record[0]})
+                                attribute.write({'remote_attribute_id': remote_record[0]})
 
                         except Exception as e:
                             _logger.error(f"Error updating relationships for {attribute.name}: {e}")
@@ -113,7 +124,7 @@ class ProductAttribute(models.Model):
 
     def write(self, vals):
         for record in self:
-            if record._db_sync_enabled() and record.related_attribute_id:
+            if record._db_sync_enabled() and record.remote_attribute_id:
                 config = record._get_external_config()
                 url = config['url']
                 db = config['db']
@@ -121,7 +132,7 @@ class ProductAttribute(models.Model):
                 password = config['password']
                 remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
                 remote_record = remote_models.execute_kw(db, uid, password, 'product.attribute', 'search',
-                                                         [[['id', '=', record.related_attribute_id]]], {'limit': 1})
+                                                         [[['id', '=', record.remote_attribute_id]]], {'limit': 1})
                 if remote_record:
                     remote_models.execute_kw(db, uid, password, 'product.attribute', 'write',
                                              [remote_record, vals])
@@ -138,11 +149,11 @@ class ProductAttribute(models.Model):
             remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
 
             for attribute in self:
-                if attribute.related_attribute_id:
+                if attribute.remote_attribute_id:
                     # Search for the attribute in the remote DB
                     remote_attribute_ids = remote_models.execute_kw(
                         db, uid, password, 'product.attribute', 'search',
-                        [[['id', '=', attribute.related_attribute_id]]]
+                        [[['id', '=', attribute.remote_attribute_id]]]
                     )
                     # If found, unlink it
                     if remote_attribute_ids:

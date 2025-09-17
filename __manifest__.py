@@ -21,7 +21,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'contacts', 'sale_management', 'accountant', 'purchase'],
+    'depends': ['base', 'contacts', 'product', 'sale_management', 'accountant', 'purchase'],
 
     # always loaded
     'data': [
@@ -44,6 +44,7 @@
         'views/upazila_views.xml',
         'views/union_views.xml',
         'views/contact_setting_views.xml',
+        'views/product_attribute_view_form.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
