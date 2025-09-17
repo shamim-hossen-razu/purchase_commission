@@ -210,6 +210,7 @@ class ProductTemplate(models.Model):
                             (0, combo[1], combo[2]) if combo[0] == Command.CLEAR else combo
                             for combo in vals['combo_ids']
                         ]
+                        vals.pop('combo_ids', None)
                     return super(ProductTemplate, self).write(vals)
                 else:
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
@@ -221,8 +222,9 @@ class ProductTemplate(models.Model):
                 # if "combo_ids" in vals and isinstance(vals["combo_ids"], (list, tuple)):
                 #     vals["combo_ids"] = _normalize_x2many_for_rpc(vals["combo_ids"])
                 #     _logger.info("combo_ids normalized for RPC: %s", vals["combo_ids"])
-
+                vals.pop('combo_ids', None)
                 _logger.info(vals)
+
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
                 return super(ProductTemplate, self).write(vals)
 
