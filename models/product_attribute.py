@@ -154,14 +154,11 @@ class ProductAttribute(models.Model):
                             value_data[1] = remote_db_attribute_value_id[0] if remote_db_attribute_value_id else False
 
                         # Handle case when vendors are being added newly
-                        if len(value_data) > 2 and value_data[0] == 0 and isinstance(value_data[2], dict):
-                            value_data[2]['attribute_id'] = record.remote_attribute_id
+                        # if len(value_data) > 2 and value_data[0] == 0 and isinstance(value_data[2], dict):
+                        #     value_data[2]['attribute_id'] = record.remote_attribute_id
                     remote_models.execute_kw(db, uid, password, 'product.attribute', 'write', [remote_record, copied_vals])
                 else:
                     remote_models.execute_kw(db, uid, password, 'product.attribute', 'write', [remote_record, vals])
-                if remote_record:
-                    remote_models.execute_kw(db, uid, password, 'product.attribute', 'write',
-                                             [remote_record, vals])
         return super(ProductAttribute, self).write(vals)
 
     def unlink(self):
