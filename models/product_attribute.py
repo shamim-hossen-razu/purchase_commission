@@ -3,6 +3,7 @@ import xmlrpc.client
 from odoo.exceptions import ValidationError
 import logging
 _logger = logging.getLogger(__name__)
+from copy import deepcopy
 
 
 class ProductAttribute(models.Model):
@@ -99,8 +100,10 @@ class ProductAttribute(models.Model):
                                 [[['name', '=', attribute.name]]],
                                 {'limit': 1}
                             )
-
+                            _logger.info(f"Linking local attribute '{attribute.name}' with remote ID {remote_record}")
+                            print('Linking local attribute', attribute.name, 'with remote ID', remote_record)
                             if remote_record:
+                                print('Remote record found', remote_record)
                                 # Write related partner id from main database to remote record
                                 remote_models.execute_kw(
                                     db, uid, password,
@@ -113,7 +116,6 @@ class ProductAttribute(models.Model):
 
                         except Exception as e:
                             _logger.error(f"Error updating relationships for {attribute.name}: {e}")
-                            continue
 
                 return new_attributes
 
@@ -136,6 +138,17 @@ class ProductAttribute(models.Model):
                 remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
                 remote_record = remote_models.execute_kw(db, uid, password, 'product.attribute', 'search',
                                                          [[['id', '=', record.remote_attribute_id]]], {'limit': 1})
+
+                if vals.get('value_ids'):
+                    copied_vals = deepcopy(vals)
+                    for i, value_data in enumerate(copied_vals['value_ids']):
+                        if len(value_data) > 2 and isinstance(value_data[2], dict):
+                            print('hello')
+                            print('hello')
+                            print('hello')
+                    remote_models.execute_kw(db, uid, password, 'product.attribute', 'write', [remote_record, copied_vals])
+                else:
+                    remote_models.execute_kw(db, uid, password, 'product.attribute', 'write', [remote_record, vals])
                 if remote_record:
                     remote_models.execute_kw(db, uid, password, 'product.attribute', 'write',
                                              [remote_record, vals])
