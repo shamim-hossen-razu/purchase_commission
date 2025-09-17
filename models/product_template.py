@@ -157,6 +157,42 @@ class ProductTemplate(models.Model):
                                                   [[rec.related_product_id], copied_vals])
 
                     return super(ProductTemplate, self).write(vals)
+                if vals.get('attribute_line_ids', False):
+                    copied_vals = deepcopy(vals)
+                    for i, attr_data in enumerate(copied_vals['attribute_line_ids']):
+                        # Handle case when attribute lines are being added newly
+                        if len(attr_data) > 2 and attr_data[0] == 0 and isinstance(attr_data[2], dict):
+                            for value_id in attr_data[2].get('value_ids', []):
+                                main_db_value_id = value_id[1] if len(value_id) > 1 else None
+                                if main_db_value_id:
+                                    main_value = self.env['product.attribute.value'].browse(main_db_value_id)
+                                    # search on remote db by main_value.name in 'product.attribute.value' model with limit = 1
+                                    remote_value_id = models_rpc.execute_kw(
+                                        db, uid, password, 'product.attribute.value', 'search',
+                                        [[['name', '=', main_value.name]]], {'limit': 1}
+                                    )
+                                    value_id[1] = remote_value_id[0] if remote_value_id else None
+                            # map attribute_id with remote attribute_id
+                            attribute_id = attr_data[2].get('attribute_id', False)
+                            if attribute_id:
+                                attribute = self.env['product.attribute'].browse(attribute_id)
+                                if attribute.remote_attribute_id:
+                                    copied_vals['attribute_line_ids'][i][2]['attribute_id'] = attribute.remote_attribute_id
+                        if len(attr_data) > 2 and attr_data[0] == 1 and isinstance(attr_data[2], dict):
+                            for value_id in attr_data[2].get('value_ids', []):
+                                main_db_value_id = value_id[1] if len(value_id) > 1 else None
+                                if main_db_value_id:
+                                    main_value = self.env['product.attribute.value'].browse(main_db_value_id)
+                                    # search on remote db by main_value.name in 'product.attribute.value' model with limit = 1
+                                    remote_value_id = models_rpc.execute_kw(
+                                        db, uid, password, 'product.attribute.value', 'search',
+                                        [[['name', '=', main_value.name]]], {'limit': 1}
+                                    )
+                                    value_id[1] = remote_value_id[0] if remote_value_id else None
+
+                    models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
+                                          [[rec.related_product_id], copied_vals])
+                    return super(ProductTemplate, self).write(vals)
                 else:
                     # remove combo_ids from vals if combo_ids any tuple has CLEAR command at tuple[0]
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
