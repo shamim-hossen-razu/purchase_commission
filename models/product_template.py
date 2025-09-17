@@ -153,9 +153,7 @@ class ProductTemplate(models.Model):
                                           [[rec.related_product_id], vals])
                 return super(ProductTemplate, self).write(vals)
             else:
-                vals.pop('combo_ids', None)
                 _logger.info(vals)
-
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
                 return super(ProductTemplate, self).write(vals)
 
