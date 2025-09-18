@@ -82,7 +82,7 @@ class ProductAttribute(models.Model):
                                 'product.attribute', 'create',
                                 [vals]
                             )
-                            print('Remote record created', remote_record)
+                            _logger.info(f"Created remote attribute with ID {remote_record} for {vals.get('name', 'Unknown')}")
                     except Exception as e:
                         _logger.error(f"Error processing remote record for {vals.get('name', 'Unknown')}: {e}")
 
