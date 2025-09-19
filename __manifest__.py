@@ -45,6 +45,7 @@
         'views/union_views.xml',
         'views/contact_setting_views.xml',
         'views/product_attribute_view_form.xml',
+        'views/inherited_account_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

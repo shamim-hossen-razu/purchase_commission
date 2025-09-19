@@ -18,8 +18,8 @@ from . import product_template_attribute_line
 from . import product_supplierinfo
 from . import product_attribute
 from . import attribute_value
-from . import account_account
-
+from . import db_sync
+from . import inherited_account
 
 
 
