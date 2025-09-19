@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from copy import deepcopy
 import xmlrpc.client
 import logging
 _logger = logging.getLogger(__name__)
@@ -63,12 +64,24 @@ class InheritedAccount(models.Model):
                         )
                         if not existing_records:
                             _logger.info(f"Creating new remote record for attribute: {vals.get('name', 'Unknown')}")
-                            # No existing record found, create a new one in the remote DB
-
+                            copied_vals = deepcopy(vals)
+                            main_company_name = self.env.user.company_id.name
+                            remote_company_id = remote_models.execute_kw(
+                                db, uid, password,
+                                'res.company', 'search',
+                                [[['name', '=', main_company_name]]],
+                                {'limit': 1}
+                            )
+                            if vals.get('code_mapping_ids', False):
+                                for item in copied_vals['code_mapping_ids']:
+                                    if len(item) > 2 and 'company_id' in item[2]:
+                                        item[2]['company_id'] = remote_company_id[0] if remote_company_id else False
+                                    else:
+                                        copied_vals['code_mapping_ids'].remove(item)
                             remote_record = remote_models.execute_kw(
                                 db, uid, password,
                                 'account.account', 'create',
-                                [vals]
+                                [copied_vals]
                             )
                             _logger.info(f"Created remote attribute with ID {remote_record} for {vals.get('name', 'Unknown')}")
 
@@ -80,28 +93,25 @@ class InheritedAccount(models.Model):
                 for account in new_accounts:
                     if not account.remote_account_id:
                         try:
-                            # Find related record id from remote db
-                            remote_record = remote_models.execute_kw(
+                            # search remote database with account name limit 1
+                            remote_account_id = remote_models.execute_kw(
                                 db, uid, password,
                                 'account.account', 'search',
-                                [[['name', '=', account.name]]],
+                                [[['name', '=ilike', account.name]]],
                                 {'limit': 1}
                             )
-                            _logger.info(
-                                f"Linking local account '{account.name}' with remote ID {remote_record}")
-                            if remote_record:
-                                _logger.info(
-                                    f"Linking local account '{account.name}' with remote ID {remote_record[0]}")
-                                # Write related partner id from main database to remote record
-                                remote_models.execute_kw(
-                                    db, uid, password,
-                                    'account.account', 'write',
-                                    [remote_record, {'remote_account_id': account.id}]
-                                )
+                            if remote_account_id:
+                                account.remote_account_id = remote_account_id[0]
+                                _logger.info(f"Linked local account {account.name} with remote ID {account.remote_account_id}")
+                            else:
+                                _logger.warning(f"No remote account found for {account.name}")
+                            # write back local account id to remote
 
-                                # Write related account id from remote database to main record
-                                account.write({'remote_account_id': remote_record[0]})
-
+                            remote_models.execute_kw(
+                                db, uid, password,
+                                'account.account', 'write',
+                                [[account.remote_account_id], {'remote_account_id': account.id}]
+                            )
                         except Exception as e:
                             _logger.error(f"Error updating relationships for {account.name}: {e}")
 
