@@ -176,13 +176,26 @@ class SaleOrder(models.Model):
                     if copied_vals.get('partner_id', False):
                         main_db_partner = self.env['res.partner'].browse(vals['partner_id'])
                         copied_vals['partner_id'] = main_db_partner.related_partner_id
+                        copied_vals['partner_invoice_id'] = main_db_partner.related_partner_id
                         print(f'Mapped partner {main_db_partner.id} to remote ID {copied_vals["partner_id"]}')
                     if copied_vals.get('order_line', False):
                         for line in copied_vals['order_line']:
                             line[2]['product_template_id'] = self.env['product.template'].browse(
                                 line[2]['product_template_id']).related_product_id
+                            display_name = self.env['product.product'].browse(
+                                line[2]['product_id']).display_name
+                            remote_product_id = remote_models.execute_kw(
+                                db, uid, password, 'product.product', 'search',
+                                [[['display_name', '=', display_name]]]
+                            )
+                            if remote_product_id:
+                                print(f'Mapped product {line[2]["product_id"]} ({display_name}) to remote ID {remote_product_id[0]}')
+                                line[2]['product_id'] = remote_product_id[0]
+
                     print('Original', vals.get('order_line', []))
                     print('Copied', copied_vals.get('order_line', []))
+                    if copied_vals.get('pricelist_id', False):
+                        copied_vals.pop('pricelist_id')
                     remote_id = remote_models.execute_kw(db, uid, password, 'sale.order', 'create', [copied_vals])
                     print(f'Created remote sale.order with ID: {remote_id}')
                     vals['remote_sale_order_id'] = remote_id
