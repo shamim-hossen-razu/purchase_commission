@@ -13,6 +13,9 @@
                 <xpath expr="//page[@name='order_lines']//field[@name='order_line']/list//field[@name='product_packaging_qty']" position="after">
                     <field name="set_name"/>
                 </xpath>
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="remote_sale_order_id"/>
+                </xpath>
             </field>
         </record>
 
