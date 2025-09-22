@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="sale.menu_product_combos" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="sale.sales_team_config" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="sale.menu_product_tags" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="sale.payment_menu" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="sale.sale_menu_config_activities" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+</odoo>

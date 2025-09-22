@@ -65,9 +65,47 @@ class ProductTemplate(models.Model):
                     existing_records = remote_models.execute_kw(db, uid, password, 'product.template', 'search',
                                                                 [[['name', '=ilike', vals.get('name')]]])
                     if not existing_records:
-                        # No existing record found, create a new one in the remote DB
-                        if vals.get('seller_ids', False):
-                            copied_vals = deepcopy(vals)
+                        copied_vals = deepcopy(vals)
+                        if copied_vals.get('attribute_line_ids', False):
+                            for attr_line in copied_vals['attribute_line_ids']:
+                                if len(attr_line) > 2 and isinstance(attr_line[2], dict):
+                                    # Process attribute_id
+                                    attribute_id = attr_line[2].get('attribute_id', False)
+                                    if attribute_id:
+                                        attribute = self.env['product.attribute'].browse(attribute_id)
+                                        remote_attribute_id = remote_models.execute_kw(
+                                            db, uid, password, 'product.attribute', 'search',
+                                            [[['name', '=', attribute.name]]], {'limit': 1}
+                                        )
+                                        if remote_attribute_id:
+                                            attr_line[2]['attribute_id'] = remote_attribute_id[0]
+                                        else:
+                                            new_remote_attribute_id = remote_models.execute_kw(
+                                                db, uid, password, 'product.attribute', 'create',
+                                                [{'name': attribute.name}]
+                                            )
+                                            attr_line[2]['attribute_id'] = new_remote_attribute_id
+
+                                    # Process value_ids
+                                    if 'value_ids' in attr_line[2]:
+                                        for value in attr_line[2]['value_ids']:
+                                            if len(value) > 1:
+                                                main_value_id = value[1]
+                                                main_value = self.env['product.attribute.value'].browse(main_value_id)
+                                                remote_value_id = remote_models.execute_kw(
+                                                    db, uid, password, 'product.attribute.value', 'search',
+                                                    [[['name', '=', main_value.name]]], {'limit': 1}
+                                                )
+                                                if remote_value_id:
+                                                    value[1] = remote_value_id[0]
+                                                else:
+                                                    new_remote_value_id = remote_models.execute_kw(
+                                                        db, uid, password, 'product.attribute.value', 'create',
+                                                        [{'name': main_value.name}]
+                                                    )
+                                                    value[1] = new_remote_value_id
+
+                        if copied_vals.get('seller_ids', False):
                             for i, seller_data in enumerate(copied_vals['seller_ids']):
                                 if len(seller_data) > 2 and isinstance(seller_data[2], dict):
                                     partner_id = seller_data[2].get('partner_id', False)
@@ -75,9 +113,23 @@ class ProductTemplate(models.Model):
                                         partner = self.env['res.partner'].browse(partner_id)
                                         if partner.related_partner_id:
                                             copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
-                            remote_models.execute_kw(db, uid, password, 'product.template', 'create', [copied_vals])
-                        else:
-                            remote_models.execute_kw(db, uid, password, 'product.template', 'create', [vals])
+                        # Handle case when income/expense account is set
+                        if copied_vals.get('property_account_income_id', False):
+                            account_id = copied_vals['property_account_income_id']
+                            account = self.env['account.account'].browse(account_id)
+                            if account.remote_account_id:
+                                copied_vals['property_account_income_id'] = account.remote_account_id
+                        if copied_vals.get('property_account_expense_id', False):
+                            account_id = copied_vals['property_account_expense_id']
+                            account = self.env['account.account'].browse(account_id)
+                            if account.remote_account_id:
+                                copied_vals['property_account_expense_id'] = account.remote_account_id
+                        if copied_vals.get('categ_id', False):
+                            category_id = copied_vals['categ_id']
+                            category = self.env['product.category'].browse(category_id)
+                            if category.remote_category_id:
+                                copied_vals['categ_id'] = category.remote_category_id
+                        remote_models.execute_kw(db, uid, password, 'product.template', 'create', [copied_vals])
                 except Exception as e:
                     raise ValidationError(f"Error during creating product in remote database: {e}")
             # Create the records in main database
@@ -114,8 +166,8 @@ class ProductTemplate(models.Model):
                 except Exception as e:
                     raise ValidationError(f"Failed to connect to external server: {e}")
                 # handle case when vendors are added in product template
-                if vals.get('seller_ids', False):
-                    copied_vals = deepcopy(vals)
+                copied_vals = deepcopy(vals)
+                if copied_vals.get('seller_ids', False):
                     for i, seller_data in enumerate(copied_vals['seller_ids']):
                         _logger.info(f"Processing seller_data: {seller_data}")
                         # Handle case when vendors are being added newly
@@ -125,9 +177,6 @@ class ProductTemplate(models.Model):
                                 partner = self.env['res.partner'].browse(partner_id)
                                 if partner.related_partner_id:
                                     copied_vals['seller_ids'][i][2]['partner_id'] = partner.related_partner_id
-                                    models_rpc.execute_kw(db, uid, password, 'product.template',
-                                                                              'write',
-                                                                              [[rec.related_product_id], copied_vals])
                         # Handle case when vendor line is being edited
                         elif len(seller_data) > 2 and seller_data[0] == 1 and isinstance(seller_data[2], dict):
                             main_db_supplier_info_id = seller_data[1]
@@ -145,20 +194,14 @@ class ProductTemplate(models.Model):
                                     )
                                     if remote_supplier_info_ids:
                                         copied_vals['seller_ids'][i][1] = remote_supplier_info_ids[0]
-                                        models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
-                                                              [[rec.related_product_id], copied_vals])
                                     else:
                                         raise ValidationError(f"Related supplier info not found in remote DB for product_tmpl_id {related_product_id} and partner_id {related_partner_id}")
                                 else:
                                     raise ValidationError("Related product or partner ID not found for supplier info update.")
                         else:
                             copied_vals.pop('seller_ids', None)
-                            models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
-                                                  [[rec.related_product_id], copied_vals])
 
-                    return super(ProductTemplate, self).write(vals)
-                if vals.get('attribute_line_ids', False):
-                    copied_vals = deepcopy(vals)
+                if copied_vals.get('attribute_line_ids', False):
                     for i, attr_data in enumerate(copied_vals['attribute_line_ids']):
                         # Handle case when attribute lines are being added newly
                         if len(attr_data) > 2 and attr_data[0] == 0 and isinstance(attr_data[2], dict):
@@ -193,11 +236,26 @@ class ProductTemplate(models.Model):
                     models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                           [[rec.related_product_id], copied_vals])
                     return super(ProductTemplate, self).write(vals)
-                else:
-                    # remove combo_ids from vals if combo_ids any tuple has CLEAR command at tuple[0]
-                    models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
-                                          [[rec.related_product_id], vals])
-                    return super(ProductTemplate, self).write(vals)
+
+                if copied_vals.get('property_account_income_id', False):
+                    account_id = copied_vals['property_account_income_id']
+                    account = self.env['account.account'].browse(account_id)
+                    if account.remote_account_id:
+                        copied_vals['property_account_income_id'] = account.remote_account_id
+                if copied_vals.get('property_account_expense_id', False):
+                    account_id = copied_vals['property_account_expense_id']
+                    account = self.env['account.account'].browse(account_id)
+                    if account.remote_account_id:
+                        copied_vals['property_account_expense_id'] = account.remote_account_id
+                if copied_vals.get('categ_id', False):
+                    category_id = copied_vals['categ_id']
+                    category = self.env['product.category'].browse(category_id)
+                    if category.remote_category_id:
+                        copied_vals['categ_id'] = category.remote_category_id
+
+                models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
+                                      [[rec.related_product_id], copied_vals])
+                return super(ProductTemplate, self).write(vals)
             else:
                 _logger.info(vals)
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")

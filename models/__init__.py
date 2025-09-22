@@ -20,6 +20,7 @@ from . import product_attribute
 from . import attribute_value
 from . import db_sync
 from . import inherited_account
+from . import product_category
 
 
 
