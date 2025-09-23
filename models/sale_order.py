@@ -182,16 +182,8 @@ class SaleOrder(models.Model):
                         for line in copied_vals['order_line']:
                             line[2]['product_template_id'] = self.env['product.template'].browse(
                                 line[2]['product_template_id']).related_product_id
-                            display_name = self.env['product.product'].browse(
-                                line[2]['product_id']).display_name
-                            remote_product_id = remote_models.execute_kw(
-                                db, uid, password, 'product.product', 'search',
-                                [[['display_name', '=', display_name]]]
-                            )
-                            if remote_product_id:
-                                print(f'Mapped product {line[2]["product_id"]} ({display_name}) to remote ID {remote_product_id[0]}')
-                                line[2]['product_id'] = remote_product_id[0]
 
+                            line[2]["product_id"] = self.env['product.product'].search([('id', '=', line[2]['product_id'])]).remote_product_id
                     print('Original', vals.get('order_line', []))
                     print('Copied', copied_vals.get('order_line', []))
                     if copied_vals.get('pricelist_id', False):

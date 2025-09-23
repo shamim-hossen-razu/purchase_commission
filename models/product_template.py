@@ -147,23 +147,19 @@ class ProductTemplate(models.Model):
                     # write related partner id from remote database to main record
                     product.write({'related_product_id': remote_record[0] if remote_record else False})
 
-                    if product.product_variant_ids:
-                        for variant in product.product_variant_ids:
-                            if not variant.remote_product_id:
-                                remote_attr_id = variant.attribue_id.remote_attribute_id
-                                attr_val_name = self.env['product.attribute.value'].browse(variant.product_attribute_value_id).name
-                                remote_attr_val_id = remote_models.execute_kw(db, uid, password, 'product.attribute.value', 'search',
-                                                         [[['name', '=', attr_val_name],
-                                                           ['attribute_id', '=', remote_attr_id]]], {'limit': 1})
-                                remote_variant = remote_models.execute_kw(db, uid, password, 'product.product', 'search',
-                                            [[['product_tmpl_id', '=', product.related_product_id],
-                                              ['attribute_id', '=', remote_attr_id],
-                                              ['product_attribute_value_id', '=', remote_attr_val_id]
-                                              ]], {'limit': 1})
-                                variant.write({'remote_product_id': remote_variant if remote_variant else False})
-                                remote_models.execute_kw(db, uid, password, 'product.product', 'write',
-                                                [remote_variant, {'related_product_id': variant.id}])
-
+                    remote_variants = remote_models.execute_kw(
+                        db, uid, password, 'product.template', 'search_read',
+                            [[['id', '=', remote_record]]],
+                            {'fields': ['product_variant_ids']}
+                    )
+                    remote_variants = remote_variants[0]['product_variant_ids'] if remote_variants else []
+                    remote_variants = sorted(remote_variants)
+                    main_db_variants = [id for id in product.product_variant_ids]
+                    main_db_variants = sorted(main_db_variants, key=lambda x: x.id)
+                    for remote_product_id, main_product in zip(remote_variants, main_db_variants):
+                        main_product.write({'remote_product_id': remote_product_id})
+                        remote_models.execute_kw(db, uid, password, 'product.product', 'write',
+                                                 [remote_product_id, {'remote_product_id': main_product.id}])
             return new_products
         else:
             _logger.info("Data sync not enabled; skipping external DB operation.")
@@ -183,6 +179,7 @@ class ProductTemplate(models.Model):
                     models_rpc = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
                 except Exception as e:
                     raise ValidationError(f"Failed to connect to external server: {e}")
+                res = super(ProductTemplate, self).write(vals)
                 # handle case when vendors are added in product template
                 copied_vals = deepcopy(vals)
                 if copied_vals.get('seller_ids', False):
@@ -239,7 +236,19 @@ class ProductTemplate(models.Model):
                                 attribute = self.env['product.attribute'].browse(attribute_id)
                                 if attribute.remote_attribute_id:
                                     copied_vals['attribute_line_ids'][i][2]['attribute_id'] = attribute.remote_attribute_id
+                        # Handle cases when line are being edited
                         if len(attr_data) > 2 and attr_data[0] == 1 and isinstance(attr_data[2], dict):
+                            ptal = self.env['product.template.attribute.line'].browse(attr_data[1])
+                            remote_product_tmpl_id = ptal.product_tmpl_id.related_product_id
+                            remote_attribute_id = ptal.attribute_id.remote_attribute_id
+                            if remote_product_tmpl_id and remote_attribute_id:
+                                remote_ptal_id = models_rpc.execute_kw(
+                                    db, uid, password, 'product.template.attribute.line', 'search',
+                                    [[['product_tmpl_id', '=', remote_product_tmpl_id],
+                                      ['attribute_id', '=', remote_attribute_id]]]
+                                )
+                                if remote_ptal_id:
+                                    attr_data[1] = remote_ptal_id
                             for value_id in attr_data[2].get('value_ids', []):
                                 main_db_value_id = value_id[1] if len(value_id) > 1 else None
                                 if main_db_value_id:
@@ -250,11 +259,6 @@ class ProductTemplate(models.Model):
                                         [[['name', '=', main_value.name]]], {'limit': 1}
                                     )
                                     value_id[1] = remote_value_id[0] if remote_value_id else None
-
-                    models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
-                                          [[rec.related_product_id], copied_vals])
-                    return super(ProductTemplate, self).write(vals)
-
                 if copied_vals.get('property_account_income_id', False):
                     account_id = copied_vals['property_account_income_id']
                     account = self.env['account.account'].browse(account_id)
@@ -271,9 +275,32 @@ class ProductTemplate(models.Model):
                     if category.remote_category_id:
                         copied_vals['categ_id'] = category.remote_category_id
 
-                models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
+                remote_record = models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                       [[rec.related_product_id], copied_vals])
-                return super(ProductTemplate, self).write(vals)
+
+                for rec in res:
+                    main_db_variants = [id for id in rec.product_variant_ids if not id.remote_product_id]
+                    remote_variants = models_rpc.execute_kw(
+                        db, uid, password, 'product.template', 'search_read',
+                        [[['id', '=', remote_record]]],
+                        {'fields': ['product_variant_ids']}
+                    )
+                    remote_variants = remote_variants[0]['product_variant_ids'] if remote_variants else []
+                    filtered_remote_variants = []
+                    for remote_variant in remote_variants:
+                        remote_var_id = models_rpc.execute_kw(
+                            db, uid, password, 'product.product', 'search_read',
+                            [[['id', '=', remote_variant], ['remote_product_id', '!=', False]]],
+                            {'fields': ['id']})
+                        if remote_var_id:
+                            filtered_remote_variants.append(remote_var_id)
+
+                    remote_variants = sorted(filtered_remote_variants)
+                    for remote_product_id, main_product in zip(remote_variants, main_db_variants):
+                        main_product.write({'remote_product_id': remote_product_id})
+                        models_rpc.execute_kw(db, uid, password, 'product.product', 'write',
+                                                 [remote_product_id, {'remote_product_id': main_product.id}])
+
             else:
                 _logger.info(vals)
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
