@@ -48,6 +48,7 @@
         'views/inherited_account_views.xml',
         'views/product_category_views.xml',
         'views/hide_menues_from_sales_setting.xml',
+        'views/product_variant_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

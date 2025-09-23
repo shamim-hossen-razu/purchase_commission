@@ -146,6 +146,24 @@ class ProductTemplate(models.Model):
 
                     # write related partner id from remote database to main record
                     product.write({'related_product_id': remote_record[0] if remote_record else False})
+
+                    if product.product_variant_ids:
+                        for variant in product.product_variant_ids:
+                            if not variant.remote_product_id:
+                                remote_attr_id = variant.attribue_id.remote_attribute_id
+                                attr_val_name = self.env['product.attribute.value'].browse(variant.product_attribute_value_id).name
+                                remote_attr_val_id = remote_models.execute_kw(db, uid, password, 'product.attribute.value', 'search',
+                                                         [[['name', '=', attr_val_name],
+                                                           ['attribute_id', '=', remote_attr_id]]], {'limit': 1})
+                                remote_variant = remote_models.execute_kw(db, uid, password, 'product.product', 'search',
+                                            [[['product_tmpl_id', '=', product.related_product_id],
+                                              ['attribute_id', '=', remote_attr_id],
+                                              ['product_attribute_value_id', '=', remote_attr_val_id]
+                                              ]], {'limit': 1})
+                                variant.write({'remote_product_id': remote_variant if remote_variant else False})
+                                remote_models.execute_kw(db, uid, password, 'product.product', 'write',
+                                                [remote_variant, {'related_product_id': variant.id}])
+
             return new_products
         else:
             _logger.info("Data sync not enabled; skipping external DB operation.")
