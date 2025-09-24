@@ -8,14 +8,23 @@
             <xpath expr="//group[@name='group_general']/field[@name='type']" position="before">
                 <field name="related_product_id" readonly="1"/>
             </xpath>
-<!--            <xpath expr="//field[@name='taxes_id']" position="attributes">-->
-<!--                <attribute name="invisible">1</attribute>-->
-<!--            </xpath>-->
-<!--            <xpath expr="//field[@name='supplier_taxes_id']" position="attributes">-->
-<!--                <attribute name="invisible">1</attribute>-->
-<!--            </xpath>-->
+            <xpath expr="//field[@name='taxes_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='supplier_taxes_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='variants']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='sales']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <xpath expr="//field[@name='attribute_id']" position="replace">
                 <field name="attribute_id" options="{'no_open': True, 'no_create': True}"/>
+            </xpath>
+            <xpath expr="//button[@name='%(product.product_variant_action)d']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//field[@name='value_ids']" position="attributes">
                 <attribute name="options">{'no_open': True, 'no_create': True}</attribute>

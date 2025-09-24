@@ -177,26 +177,111 @@ class SaleOrder(models.Model):
                         main_db_partner = self.env['res.partner'].browse(vals['partner_id'])
                         copied_vals['partner_id'] = main_db_partner.related_partner_id
                         copied_vals['partner_invoice_id'] = main_db_partner.related_partner_id
-                        print(f'Mapped partner {main_db_partner.id} to remote ID {copied_vals["partner_id"]}')
                     if copied_vals.get('order_line', False):
                         for line in copied_vals['order_line']:
                             line[2]['product_template_id'] = self.env['product.template'].browse(
                                 line[2]['product_template_id']).related_product_id
+                            if line[2].get('product_id', False):
+                                line[2]["product_id"] = self.env['product.product'].search([('id', '=', line[2]['product_id'])]).remote_product_id
 
-                            line[2]["product_id"] = self.env['product.product'].search([('id', '=', line[2]['product_id'])]).remote_product_id
-                    print('Original', vals.get('order_line', []))
-                    print('Copied', copied_vals.get('order_line', []))
+                            if line[2].get('product_packaging_id', False):
+                                main_db_packaging_id = self.env['product.packaging'].browse(
+                                    line[2]['product_packaging_id'])
+                                remote_product_id = main_db_packaging_id.product_id.remote_product_id
+                                qty = main_db_packaging_id.qty
+                                remote_packaging_id = remote_models.execute_kw(db, uid, password, 'product.packaging',
+                                                                               'search', [[['product_id', '=',
+                                                                                            remote_product_id],
+                                                                                           ['qty', '=', qty]]],
+                                                                               {'limit': 1})
+                                line[2]['product_packaging_id'] = remote_packaging_id[
+                                    0] if remote_packaging_id else False
+
                     if copied_vals.get('pricelist_id', False):
                         copied_vals.pop('pricelist_id')
                     remote_id = remote_models.execute_kw(db, uid, password, 'sale.order', 'create', [copied_vals])
-                    print(f'Created remote sale.order with ID: {remote_id}')
                     vals['remote_sale_order_id'] = remote_id
-                return super().create(vals_list)
+                new_sale_orders = super().create(vals_list)
+                for sale_order in new_sale_orders:
+                    main_db_partner_id = sale_order.partner_id
+                    remote_db_partner_id = main_db_partner_id.related_partner_id
+                    quotation_date = sale_order.date_order
+                    remote_sale_order_id = remote_models.execute_kw(db, uid, password, 'sale.order', 'search', [[['partner_id', '=', remote_db_partner_id], ['date_order', '=', quotation_date]]], {'limit': 1})
+                    remote_models.execute_kw(db, uid, password, 'sale.order', 'write', [[remote_sale_order_id[0]], {'remote_sale_order_id': sale_order.id}])
+                return new_sale_orders
             except Exception as e:
                 _logger.error(f'Failed to connect to external server: {e}')
                 return super().create(vals_list)
         else:
             return super().create(vals_list)
+
+    def write(self, vals):
+        res = super(SaleOrder, self).write(vals)
+        if self._db_sync_enabled():
+            _logger.warning('Data sync is enabled, attempting to sync partners to external DB')
+            config = self._get_external_config()
+            url = config['url']
+            db = config['db']
+            uid = config['uid']
+            password = config['password']
+            try:
+                remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+                for order in self:
+                    if not order.remote_sale_order_id:
+                        _logger.info(f'Skipping sync for Sale Order {order.name} as it has no remote ID')
+                        continue
+                    update_vals = deepcopy(vals)
+                    if update_vals.get('partner_id', False):
+                        main_db_partner = self.env['res.partner'].browse(vals['partner_id'])
+                        update_vals['partner_id'] = main_db_partner.related_partner_id
+                        update_vals['partner_invoice_id'] = main_db_partner.related_partner_id
+                    if update_vals.get('order_line', False):
+                        for line in update_vals['order_line']:
+                            if line[0] == 0:
+                                if line[2].get('product_template_id', False):
+                                    line[2]['product_template_id'] = self.env['product.template'].browse(
+                                        line[2]['product_template_id']).related_product_id
+                                if line[2].get('product_id', False):
+                                    line[2]["product_id"] = self.env['product.product'].search(
+                                        [('id', '=', line[2]['product_id'])]).remote_product_id
+                                if line[2].get('product_packaging_id', False):
+                                    main_db_packaging_id = self.env['product.packaging'].browse(
+                                        line[2]['product_packaging_id'])
+                                    remote_product_id = main_db_packaging_id.product_id.remote_product_id
+                                    qty = main_db_packaging_id.qty
+                                    remote_packaging_id = remote_models.execute_kw(db, uid, password,'product.packaging', 'search', [[['product_id', '=', remote_product_id], ['qty', '=', qty]]],
+                                                                                   {'limit': 1})
+                                    line[2]['product_packaging_id'] = remote_packaging_id[0] if remote_packaging_id else False
+                            if line[0] == 1:
+                                main_db_sale_order_line_id = line[1]
+                                main_db_sale_order_line = self.env['sale.order.line'].browse(main_db_sale_order_line_id)
+                                main_db_order_id = main_db_sale_order_line.order_id
+                                remote_db_order_id = main_db_order_id.remote_sale_order_id
+                                order_partner_id = main_db_sale_order_line.partner_id
+                                remote_order_partner_id = order_partner_id.related_partner_id
+                                product_id = main_db_sale_order_line.product_id
+                                remote_product_id = product_id.remote_product_id
+                                remote_db_sale_order_line_id = remote_models.execute_kw(db, uid, password,
+                                                                                        'sale.order.line', 'search'
+                                                                                        , [[['order_id', '=',
+                                                                                             remote_db_order_id],
+                                                                                            ['partner_id', '=',
+                                                                                             remote_order_partner_id],
+                                                                                            ['product_id', '=',
+                                                                                             remote_product_id]]],
+                                                                                        {'limit': 1})
+                                line[1] = remote_db_sale_order_line_id[0] if remote_db_sale_order_line_id else False
+                    if update_vals.get('pricelist_id', False):
+                        update_vals.pop('pricelist_id')
+                    print('writing with data:', update_vals)
+                    remote_models.execute_kw(db, uid, password, 'sale.order', 'write', [[order.remote_sale_order_id], update_vals])
+                    return res
+            except Exception as e:
+                _logger.error(f'Failed to connect to external server: {e}')
+        else:
+            _logger.info('Data sync is disabled, skipping external DB update')
+            return res
+
 
 
 

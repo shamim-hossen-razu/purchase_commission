@@ -146,20 +146,21 @@ class ProductTemplate(models.Model):
 
                     # write related partner id from remote database to main record
                     product.write({'related_product_id': remote_record[0] if remote_record else False})
-
-                    remote_variants = remote_models.execute_kw(
-                        db, uid, password, 'product.template', 'search_read',
-                            [[['id', '=', remote_record]]],
-                            {'fields': ['product_variant_ids']}
-                    )
-                    remote_variants = remote_variants[0]['product_variant_ids'] if remote_variants else []
-                    remote_variants = sorted(remote_variants)
-                    main_db_variants = [id for id in product.product_variant_ids]
-                    main_db_variants = sorted(main_db_variants, key=lambda x: x.id)
-                    for remote_product_id, main_product in zip(remote_variants, main_db_variants):
-                        main_product.write({'remote_product_id': remote_product_id})
-                        remote_models.execute_kw(db, uid, password, 'product.product', 'write',
-                                                 [remote_product_id, {'remote_product_id': main_product.id}])
+                    # handle case when product variants are available
+                    if product.product_variant_ids:
+                        remote_variants = remote_models.execute_kw(
+                            db, uid, password, 'product.template', 'search_read',
+                                [[['id', '=', remote_record]]],
+                                {'fields': ['product_variant_ids']}
+                        )
+                        remote_variants = remote_variants[0]['product_variant_ids'] if remote_variants else []
+                        remote_variants = sorted(remote_variants)
+                        main_db_variants = [id for id in product.product_variant_ids]
+                        main_db_variants = sorted(main_db_variants, key=lambda x: x.id)
+                        for remote_product_id, main_product in zip(remote_variants, main_db_variants):
+                            main_product.write({'remote_product_id': remote_product_id})
+                            remote_models.execute_kw(db, uid, password, 'product.product', 'write',
+                                                     [remote_product_id, {'remote_product_id': main_product.id}])
             return new_products
         else:
             _logger.info("Data sync not enabled; skipping external DB operation.")
@@ -215,7 +216,27 @@ class ProductTemplate(models.Model):
                                     raise ValidationError("Related product or partner ID not found for supplier info update.")
                         else:
                             copied_vals.pop('seller_ids', None)
-
+                # Handle product packing record edit.
+                if copied_vals.get('packaging_ids', False):
+                    for packaging in copied_vals.get('packaging_ids', []):
+                        # Handle Case when editing existing packaging line
+                        if len(packaging) > 2 and packaging[0] == 1 and isinstance(packaging[2], dict):
+                            main_db_packaging_id = packaging[1]
+                            main_packaging = self.env['product.packaging'].browse(main_db_packaging_id)
+                            product_id = main_packaging.product_id
+                            qty = main_packaging.qty
+                            remote_product_id = product_id.remote_product_id
+                            if remote_product_id and qty:
+                                remote_packaging_id = models_rpc.execute_kw(
+                                    db, uid, password, 'product.packaging', 'search',
+                                    [[['product_id', '=', remote_product_id],
+                                      ['qty', '=', qty]]], {'limit': 1}
+                                )
+                                if remote_packaging_id:
+                                    packaging[1] = remote_packaging_id
+                                else:
+                                    raise ValidationError(f"Related packaging not found in remote DB for product_id {remote_product_id} and qty {qty}")
+                # Handle case when product attribute and variants feature is enabled
                 if copied_vals.get('attribute_line_ids', False):
                     for i, attr_data in enumerate(copied_vals['attribute_line_ids']):
                         # Handle case when attribute lines are being added newly
@@ -274,33 +295,12 @@ class ProductTemplate(models.Model):
                     category = self.env['product.category'].browse(category_id)
                     if category.remote_category_id:
                         copied_vals['categ_id'] = category.remote_category_id
-
-                remote_record = models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
+                if copied_vals.get('product_variant_ids', False):
+                    copied_vals.pop('product_variant_ids', None)
+                models_rpc.execute_kw(db, uid, password, 'product.template', 'write',
                                       [[rec.related_product_id], copied_vals])
-
-                for rec in res:
-                    main_db_variants = [id for id in rec.product_variant_ids if not id.remote_product_id]
-                    remote_variants = models_rpc.execute_kw(
-                        db, uid, password, 'product.template', 'search_read',
-                        [[['id', '=', remote_record]]],
-                        {'fields': ['product_variant_ids']}
-                    )
-                    remote_variants = remote_variants[0]['product_variant_ids'] if remote_variants else []
-                    filtered_remote_variants = []
-                    for remote_variant in remote_variants:
-                        remote_var_id = models_rpc.execute_kw(
-                            db, uid, password, 'product.product', 'search_read',
-                            [[['id', '=', remote_variant], ['remote_product_id', '!=', False]]],
-                            {'fields': ['id']})
-                        if remote_var_id:
-                            filtered_remote_variants.append(remote_var_id)
-
-                    remote_variants = sorted(filtered_remote_variants)
-                    for remote_product_id, main_product in zip(remote_variants, main_db_variants):
-                        main_product.write({'remote_product_id': remote_product_id})
-                        models_rpc.execute_kw(db, uid, password, 'product.product', 'write',
-                                                 [remote_product_id, {'remote_product_id': main_product.id}])
-
+                logging.info(f"Updated remote product.template ID {rec.related_product_id} with vals: {copied_vals}")
+                return res
             else:
                 _logger.info(vals)
                 _logger.info("Data sync not enabled or no related_product_id; skipping external DB operation.")
