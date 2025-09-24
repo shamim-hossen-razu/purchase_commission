@@ -29,22 +29,32 @@
                                 <div class="company-details">
                                     <strong><span t-field="company.name"/></strong>
                                     <t t-if="bd_format == 'True'">
-                                        <p>
-                                            <t t-if="company.house_no or company.road_no">
-                                                <span t-if="company.house_no"><t t-out="company.house_no"/></span>
-                                                <span t-if="company.road_no">, <t t-out="company.road_no"/></span>
-                                                <br/>
-                                            </t>
-                                            <t t-if="company.union_id or company.upazila_id">
-                                                <span t-if="company.union_id"><t t-out="company.union_id.name"/></span>
-                                                <span t-if="company.upazila_id">, <t t-out="company.upazila_id.name"/></span>
-                                                <br/>
-                                            </t>
-                                            <t t-if="company.district_id or company.division_id">
-                                                <span t-if="company.district_id"><t t-out="company.district_id.name"/></span>
-                                                <span t-if="company.division_id">, <t t-out="company.division_id.name"/></span>
-                                            </t>
-                                        </p>
+                                        <div>
+                                            <strong>House &amp; Road:</strong>
+                                            <span t-if="company.house_no"><t t-out="company.house_no"/></span>
+                                            <span t-else="">---</span>
+                                            <span>, </span>
+                                            <span t-if="company.road_no"><t t-out="company.road_no"/></span>
+                                            <span t-else="">---</span>
+                                        </div>
+
+                                        <div>
+                                            <strong>Union &amp; Upazila:</strong>
+                                            <span t-if="company.union_id"><t t-out="company.union_id.name"/></span>
+                                            <span t-else="">---</span>
+                                            <span>, </span>
+                                            <span t-if="company.upazila_id"><t t-out="company.upazila_id.name"/></span>
+                                            <span t-else="">---</span>
+                                        </div>
+
+                                        <div>
+                                            <strong>District &amp; Division:</strong>
+                                            <span t-if="company.district_id"><t t-out="company.district_id.name"/></span>
+                                            <span t-else="">---</span>
+                                            <span>, </span>
+                                            <span t-if="company.division_id"><t t-out="company.division_id.name"/></span>
+                                            <span t-else="">---</span>
+                                        </div>
                                     </t>
                                     <t t-else="bd_format != 'True'">
                                         <t t-set="company_street" t-value="', '.join(filter(lambda x:x, [company.street2, company.street, company.zip]))"/>
@@ -55,28 +65,41 @@
                                 </div>
                             </div>
 
-                            <div class="col-6" style="text-align: right; padding-bottom: 10px;">
+                            <div class="col-6" style="text-align: right;">
                                 <h1><t t-out="layout_document_title"/></h1>
-                                <!-- ROW 3: Invoicing/Shipping address logic always -->
                                 <div>
                                     <t t-if="bd_format == 'True'">
                                         <div class="bd-address">
                                             <p>
-                                                <strong><t t-out="o.partner_id.name"/></strong><br/>
-                                                <t t-if="o.partner_id.house_no or o.partner_id.road_no">
+                                                <div>
+                                                    <strong><t t-out="o.partner_id.name"/></strong>
+                                                </div>
+                                                <div>
+                                                    <strong>House &amp; Road: </strong>
                                                     <span t-if="o.partner_id.house_no"><t t-out="o.partner_id.house_no"/></span>
-                                                    <span t-if="o.partner_id.road_no">, <t t-out="o.partner_id.road_no"/></span>
-                                                    <br/>
-                                                </t>
-                                                <t t-if="o.partner_id.union_id or o.partner_id.upazila_id">
+                                                    <span t-else="">---</span>
+                                                    <span>, </span>
+                                                    <span t-if="o.partner_id.road_no"><t t-out="o.partner_id.road_no"/></span>
+                                                    <span t-else="">---</span>
+                                                </div>
+
+                                                <div>
+                                                    <strong>Union &amp; Upazila: </strong>
                                                     <span t-if="o.partner_id.union_id"><t t-out="o.partner_id.union_id.name"/></span>
-                                                    <span t-if="o.partner_id.upazila_id">, <t t-out="o.partner_id.upazila_id.name"/></span>
-                                                    <br/>
-                                                </t>
-                                                <t t-if="o.partner_id.district_id or o.partner_id.division_id">
+                                                    <span t-else="">---</span>
+                                                    <span>, </span>
+                                                    <span t-if="o.partner_id.upazila_id"><t t-out="o.partner_id.upazila_id.name"/></span>
+                                                    <span t-else="">---</span>
+                                                </div>
+
+                                                <div>
+                                                    <strong>District &amp; Division: </strong>
                                                     <span t-if="o.partner_id.district_id"><t t-out="o.partner_id.district_id.name"/></span>
-                                                    <span t-if="o.partner_id.division_id">, <t t-out="o.partner_id.division_id.name"/></span>
-                                                </t>
+                                                    <span t-else="">---</span>
+                                                    <span>, </span>
+                                                    <span t-if="o.partner_id.division_id"><t t-out="o.partner_id.division_id.name"/></span>
+                                                    <span t-else="">---</span>
+                                                </div>
                                             </p>
                                         </div>
                                     </t>
@@ -92,7 +115,7 @@
                             </div>
                         </div>
 
-                        <div class="row" style="padding-top: 5px; padding-bottom: 10px;">
+                        <div id="informations" class="row" style="padding-bottom: 20px;">
                             <div t-if="o.date_order" class="col-4 text-start">
                                 <strong t-if="is_proforma">Issued Date</strong>
                                 <strong t-elif="o.state in ['draft','sent']">Quotation Date</strong>
@@ -116,7 +139,6 @@
                         <t t-set="printable_lines" t-value="[l for l in lines_to_report if not l.display_type]"/>
                         <t t-set="has_discount_lines" t-value="[l for l in printable_lines if l.discount]"/>
 
-<!--                        <table class="o_has_total_table table o_main_table table-borderless">-->
                         <table style="border-collapse: collapse; width:100%; margin-bottom:17px;">
                             <thead style="display: table-row-group">
                                 <tr>
@@ -129,9 +151,6 @@
                                     <th style="border:1px solid black; padding:4px;" class="text-end">Amount</th>
                                 </tr>
                             </thead>
-                            <tr>
-                                <td colspan="9" style="border-top: 1px solid #000; height: 5px;"/>
-                            </tr>
                             <tbody class="sale_tbody">
                                 <!-- keep your original definitions above this tbody -->
                                 <t t-set="lines_to_report" t-value="o._get_order_lines_to_report()"/>
