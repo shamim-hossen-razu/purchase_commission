@@ -12,6 +12,7 @@ class SaleOrderLine(models.Model):
         store=True,
         readonly=False,
         precompute=True)
+    remote_sale_order_line_id = fields.Integer(string='Remote Sale Order Line ID')
 
     @api.onchange('product_packaging_id')
     def _onchange_product_packaging_id(self):

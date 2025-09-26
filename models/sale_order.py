@@ -208,6 +208,12 @@ class SaleOrder(models.Model):
                     quotation_date = sale_order.date_order
                     remote_sale_order_id = remote_models.execute_kw(db, uid, password, 'sale.order', 'search', [[['partner_id', '=', remote_db_partner_id], ['date_order', '=', quotation_date]]], {'limit': 1})
                     remote_models.execute_kw(db, uid, password, 'sale.order', 'write', [[remote_sale_order_id[0]], {'remote_sale_order_id': sale_order.id}])
+                    remote_sale_order_line_ids = remote_models.execute_kw(db, uid, password, 'sale.order.line', 'search', [[['order_id', '=', remote_sale_order_id[0]]]])
+                    sale_order_lines = self.env['sale.order.line'].search([('order_id', '=', sale_order.id)])
+                    for remote_sale_order_line, main_db_sale_order_line in zip(remote_sale_order_line_ids, sale_order_lines):
+                        print('Remote: ', remote_sale_order_line, 'Main', main_db_sale_order_line.id)
+                        main_db_sale_order_line.write({'remote_sale_order_line_id': remote_sale_order_line})
+                        remote_models.execute_kw(db, uid, password, 'sale.order.line', 'write', [[remote_sale_order_line], {'remote_sale_order_line_id': main_db_sale_order_line.id}])
                 return new_sale_orders
             except Exception as e:
                 _logger.error(f'Failed to connect to external server: {e}')
