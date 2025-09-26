@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_invoice_document_inherited">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="data_report_margin_top" t-value="10"/>
+                <t t-set="company" t-value="user.company_id.sudo()"/>
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+                <t t-set="bd_format"
+                   t-value="env['ir.config_parameter'].sudo().get_param('purchase_commission.bd_format_address')"/>
+                <t t-set="report_title">
+                    <t t-if="o.move_type == 'out_invoice'">Invoice</t>
+                    <t t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">Draft Invoice</t>
+                    <t t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</t>
+                    <t t-elif="o.move_type == 'out_refund'">Credit Note</t>
+                    <t t-elif="o.move_type == 'out_refund' and o.state == 'draft'">Draft Credit Note</t>
+                    <t t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">Cancelled Credit Note</t>
+                    <t t-elif="o.move_type == 'in_invoice'">Vendor Bill</t>
+                    <t t-elif="o.move_type == 'in_refund'">Vendor Credit Note</t>
+                    <t t-if="o.name and o.name != '/'">
+                        <span t-field="o.name">INV/2023/0001</span>
+                    </t>
+                </t>
+
+                <t t-call="web.basic_layout">
+                    <div class="page">
+
+                        <!-- Header Section -->
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-6">
+                                <!-- Company Logo -->
+                                <div class="mb-3">
+                                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"
+                                         style="max-height:70px;" alt="Company Logo"/>
+                                </div>
+
+                                <div class="company-details">
+                                    <strong>
+                                        <span t-field="company.name"/>
+                                    </strong>
+                                    <t t-if="bd_format == 'True'">
+                                        <div>
+                                            <strong>House &amp; Road:</strong>
+                                            <span t-if="company.house_no">
+                                                <t t-out="company.house_no"/>
+                                            </span>
+                                            <span t-else="">---</span>
+                                            <span>,</span>
+                                            <span t-if="company.road_no">
+                                                <t t-out="company.road_no"/>
+                                            </span>
+                                            <span t-else="">---</span>
+                                        </div>
+
+                                        <div>
+                                            <strong>Union &amp; Upazila:</strong>
+                                            <span t-if="company.union_id">
+                                                <t t-out="company.union_id.name"/>
+                                            </span>
+                                            <span t-else="">---</span>
+                                            <span>,</span>
+                                            <span t-if="company.upazila_id">
+                                                <t t-out="company.upazila_id.name"/>
+                                            </span>
+                                            <span t-else="">---</span>
+                                        </div>
+
+                                        <div>
+                                            <strong>District &amp; Division:</strong>
+                                            <span t-if="company.district_id">
+                                                <t t-out="company.district_id.name"/>
+                                            </span>
+                                            <span t-else="">---</span>
+                                            <span>,</span>
+                                            <span t-if="company.division_id">
+                                                <t t-out="company.division_id.name"/>
+                                            </span>
+                                            <span t-else="">---</span>
+                                        </div>
+                                    </t>
+                                    <t t-else="bd_format != 'True'">
+                                        <t t-set="company_street"
+                                           t-value="', '.join(filter(lambda x:x, [company.street2, company.street, company.zip]))"/>
+                                        <div t-if="company_street" t-out="company_street"/>
+                                        <div t-if="company.country_id">
+                                            <span t-field="company.country_id"/>
+                                        </div>
+                                        <div t-if="company.phone">
+                                            <i class="fa fa-phone" aria-hidden="true"/>
+                                            <span t-field="company.phone"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <div class="col-6" style="text-align: right; padding-bottom: 10px;">
+                                <h3 style="font-size: 35px; font-weight: bold;">
+                                    <t t-out="report_title"/>
+                                </h3>
+                                <div>
+                                    <t t-if="bd_format == 'True'">
+                                        <div class="bd-address">
+                                            <p>
+                                                <div>
+                                                    <strong>
+                                                        <t t-out="o.partner_id.name"/>
+                                                    </strong>
+                                                    <br/>
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        <span>House &amp; Road:</span>
+                                                    </strong>
+                                                    <t t-if="o.partner_id.house_no or o.partner_id.road_no">
+                                                        <span t-if="o.partner_id.house_no">
+                                                            <t t-out="o.partner_id.house_no"/>
+                                                        </span>
+                                                        <span t-else="">---</span>
+                                                        <span>,</span>
+                                                        <span t-if="o.partner_id.road_no">,
+                                                            <t t-out="o.partner_id.road_no"/>
+                                                        </span>
+                                                        <span t-else="">---</span>
+                                                        <br/>
+                                                    </t>
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        <span>Union &amp; Upazila:</span>
+                                                    </strong>
+                                                    <t t-if="o.partner_id.union_id or o.partner_id.upazila_id">
+                                                        <span t-if="o.partner_id.union_id">
+                                                            <t t-out="o.partner_id.union_id.name"/>
+                                                        </span>
+                                                        <span t-else="">---</span>
+                                                        <span>,</span>
+                                                        <span t-if="o.partner_id.upazila_id">,
+                                                            <t t-out="o.partner_id.upazila_id.name"/>
+                                                        </span>
+                                                        <span t-else="">---</span>
+                                                        <br/>
+                                                    </t>
+                                                </div>
+                                                <div>
+                                                    <strong>
+                                                        <span>District &amp; Division:</span>
+                                                    </strong>
+                                                    <t t-if="o.partner_id.district_id or o.partner_id.division_id">
+                                                        <span t-if="o.partner_id.district_id">
+                                                            <t t-out="o.partner_id.district_id.name"/>
+                                                        </span>
+                                                        <span t-else="">---</span>
+                                                        <span>,</span>
+                                                        <span t-if="o.partner_id.division_id">,
+                                                            <t t-out="o.partner_id.division_id.name"/>
+                                                        </span>
+                                                        <span t-else="">---</span>
+                                                    </t>
+                                                </div>
+                                            </p>
+                                        </div>
+                                    </t>
+                                    <t t-else="bd_format != 'True'">
+                                        <div t-field="o.partner_id"
+                                             t-options='{"widget":"contact","fields":["name","address"],"no_marker":True}'/>
+                                        <p t-if="o.partner_id.vat" class="m-0">
+                                            <t t-out="o.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>:
+                                            <span t-field="o.partner_id.vat"/>
+                                        </p>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="padding-bottom: 20px;">
+                            <div class="col-3 text-start" t-if="o.invoice_date" name="invoice_date">
+                                <t t-if="o.move_type == 'out_invoice'">
+                                    <strong>Invoice Date</strong>
+                                </t>
+                                <t t-elif="o.move_type == 'out_refund'">
+                                    <strong>Credit Note Date</strong>
+                                </t>
+                                <t t-elif="o.move_type == 'out_receipt'">
+                                    <strong>Receipt Date</strong>
+                                </t>
+                                <t t-else="">
+                                    <strong>Date</strong>
+                                </t>
+                                <div t-field="o.invoice_date">2023-09-12</div>
+                            </div>
+
+                            <div class="col-3 text-center"
+                                 t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'"
+                                 name="due_date">
+                                <strong>Due Date</strong>
+                                <div t-field="o.invoice_date_due">2023-10-31</div>
+                            </div>
+                            <div class="col-3 text-center" t-if="o.delivery_date" name="delivery_date">
+                                <strong>Delivery Date</strong>
+                                <div t-field="o.delivery_date">2023-09-25</div>
+                            </div>
+                            <div class="col-3 text-end" t-if="o.invoice_origin" name="origin">
+                                <strong>Source</strong>
+                                <div t-field="o.invoice_origin">SO123</div>
+                            </div>
+                        </div>
+
+
+                        <!-- PAGINATED INVOICE LINES -->
+                        <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
+                        <t t-set="pages" t-value="o._report_paginated_lines(22, 30)"/>
+                        <!-- Columns: S/L, Desc, Qty, Dz/Pc, Unit, (Disc?), Amount -->
+                        <t t-set="columns" t-value="8 if display_discount else 7"/>
+
+                        <table style="border-collapse: collapse; width:100%; margin-bottom:17px;">
+                            <thead style="display: table-row-group">
+                                <tr>
+                                    <th style="border:1px solid black; padding:4px; width:30px" class="text-start">S/L
+                                    </th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-start">Description</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end">Quantity</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end">Dozen/Pieces</th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end">Unit Price</th>
+                                    <th style="border:1px solid black; padding:4px;" t-if="display_discount"
+                                        class="text-end">Disc.%
+                                    </th>
+                                    <th style="border:1px solid black; padding:4px;" class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="invoice_tbody">
+                                <t t-set="sl_no" t-value="0"/>
+                                <!-- Pages -->
+                                <t t-foreach="pages" t-as="page">
+                                    <!-- Lines on this page -->
+                                    <t t-foreach="page['lines']" t-as="line">
+                                        <tr>
+                                            <!-- Product line (works whether display_type is False or 'product') -->
+                                            <t t-if="(not line.display_type) or (line.display_type == 'product')">
+                                                <td style="border:1px solid black; padding:4px;" class="text-start">
+                                                    <t t-set="sl_no" t-value="sl_no + 1"/>
+                                                    <t t-esc="sl_no"/>
+                                                </td>
+
+                                                <td style="border:1px solid black; padding:4px;">
+                                                    <!-- show only first line of description, tooltip full -->
+                                                    <t t-set="name_first_line"
+                                                       t-value="(line.name or '').split('\n')[0]"/>
+                                                    <t t-if="len(name_first_line) > 40">
+                                                        <span t-att-title="name_first_line"><t
+                                                                t-out="name_first_line[:40]"/>…
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span t-out="name_first_line"/>
+                                                    </t>
+                                                </td>
+
+                                                <td style="border:1px solid black; padding:4px;"
+                                                    class="text-end text-nowrap">
+                                                    <span t-field="line.quantity"/>
+                                                    <span t-field="line.product_uom_id"/>
+                                                </td>
+
+                                                <td style="border:1px solid black; padding:4px;" class="text-end">
+                                                    <t t-if="line.dozen_piece_qty">
+                                                        <span t-out="line.dozen_piece_qty"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span>-</span>
+                                                    </t>
+                                                </td>
+
+                                                <td style="border:1px solid black; padding:4px;"
+                                                    class="text-end text-nowrap">
+                                                    <span t-field="line.price_unit"/>
+                                                </td>
+
+                                                <td style="border:1px solid black; padding:4px;" t-if="display_discount"
+                                                    class="text-end">
+                                                    <span t-field="line.discount"/>
+                                                </td>
+
+                                                <td style="border:1px solid black; padding:4px;"
+                                                    class="text-end o_price_total">
+                                                    <span t-field="line.price_subtotal"/>
+                                                </td>
+                                            </t>
+
+                                            <!-- Section -->
+                                            <t t-elif="line.display_type == 'line_section'">
+                                                <td colspan="99">
+                                                    <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                                </td>
+                                            </t>
+
+                                            <!-- Note -->
+                                            <t t-elif="line.display_type == 'line_note'">
+                                                <td colspan="99">
+                                                    <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+
+                                    <!-- Page subtotal (hidden on last page) -->
+                                    <tr t-if="page['show_subtotal']" class="o_page_subtotal">
+                                        <td style="border:1px solid black; padding:4px;"></td>
+                                        <td style="border:1px solid black; padding:4px;" class="text-start">
+                                            <strong>Page Subtotal</strong>
+                                        </td>
+                                        <td style="border:1px solid black; padding:4px;"></td>
+                                        <td style="border:1px solid black; padding:4px;" class="text-end">
+                                            <strong>
+                                                <t t-esc="page['qty_display']"/>
+                                            </strong>
+                                        </td>
+                                        <td style="border:1px solid black; padding:4px;"></td>
+                                        <td style="border:1px solid black; padding:4px;" t-if="display_discount"></td>
+                                        <td style="border:1px solid black; padding:4px;" class="text-end">
+                                            <strong>
+                                                <t t-esc="page['subtotal_display']"/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Force page break after subtotal row -->
+                                    <tr t-if="page['show_subtotal']">
+                                        <td t-att-colspan="columns"
+                                            style="border:none; height:0; padding:0; page-break-after: always;"></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+
+                        <!-- ===== Footer: Left (terms/comm) | Right (totals) — TABLE LAYOUT (PDF-safe) ===== -->
+                        <table style="width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; margin-top:16px;">
+                            <colgroup>
+                                <col style="width:60%;"/>
+                                <col style="width:40%;"/>
+                            </colgroup>
+                            <tr valign="top">
+                                <!-- LEFT: Payment Terms, Communication, Notes/QR -->
+                                <td style="padding-right:12px; vertical-align:top;">
+
+                                    <!-- Payment Terms -->
+                                    <div style="margin:0 0 10px 0;">
+                                        <span id="payment_terms_note_id"
+                                              t-if="o.invoice_payment_term_id.note"
+                                              t-field="o.invoice_payment_term_id.note"/>
+                                    </div>
+
+                                    <!-- Payment Communication -->
+                                    <div t-if="o.move_type in ('out_invoice','in_refund') and o.payment_reference"
+                                         style="margin:0 0 10px 0;">
+                                        <p style="margin:0;">
+                                            Payment Communication:
+                                            <span class="fw-bold" t-field="o.payment_reference"/>
+                                            <t t-if="o.partner_bank_id">
+                                                <br/>
+                                                on this account:
+                                                <span t-field="o.partner_bank_id" class="fw-bold"/>
+                                            </t>
+                                        </p>
+                                    </div>
+
+                                    <!-- QR Code -->
+                                    <t t-set="show_qr" t-value="o.display_qr_code and o.amount_residual > 0"/>
+                                    <div t-if="not show_qr" name="qr_code_placeholder" style="height:0; margin:0; padding:0;"> </div>
+                                    <div id="qrcode" class="avoid-page-break-inside" t-else=""
+                                         style="display:flex; gap:8px; margin:0 0 10px 0;">
+                                        <div class="qrcode" id="qrcode_image" style="margin:0;">
+                                            <t t-set="qr_code_url" t-value="o._generate_qr_code(silent_errors=True)"/>
+                                            <p t-if="qr_code_url" class="position-relative" style="margin:0;">
+                                                <img t-att-src="qr_code_url"/>
+                                                <img src="/account/static/src/img/Odoo_logo_O.svg"
+                                                     id="qrcode_odoo_logo"
+                                                     class="top-50 start-50 position-absolute bg-white border border-white border-3 rounded-circle"/>
+                                            </p>
+                                        </div>
+                                        <div class="text-muted lh-sm fst-italic" id="qrcode_info" t-if="qr_code_url"
+                                             style="margin:0;">
+                                            <p style="margin:0;">Scan this QR Code with<br/>your banking application
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Notes / Narration -->
+                                    <div t-if="not is_html_empty(o.narration)"
+                                         class="text-muted"
+                                         t-attf-style="#{'text-align:justify;text-justify:inter-word;' if o.company_id.terms_type != 'html' else ''}"
+                                         style="overflow-wrap:anywhere; word-break:break-word; margin:0 0 10px 0;">
+                                        <span t-field="o.narration"/>
+                                    </div>
+                                </td>
+
+                                <!-- RIGHT: Untaxed / Tax / Total (right-aligned amounts) -->
+                                <td style="padding-left:12px; vertical-align:top;">
+                                    <table style="width:100%; border-collapse:collapse; table-layout:fixed; margin:0;">
+                                        <colgroup>
+                                            <col/>                      <!-- label -->
+                                            <col style="width:140px;"/> <!-- amount -->
+                                        </colgroup>
+
+                                        <style>
+                                            /* keep spacing tight and remove unintended left indent */
+                                            .o_total_table td { padding: 2px 0; }
+                                            .o_total_table td:first-child { padding-left: 0; }
+                                        </style>
+
+                                        <tbody class="o_total_table">
+                                            <!-- Untaxed -->
+                                            <tr>
+                                                <td>Untaxed Amount</td>
+                                                <td class="text-end">
+                                                    <span t-field="o.amount_untaxed"
+                                                          t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Tax -->
+                                            <t t-set="base_for_tax" t-value="o.amount_untaxed or 0.0"/>
+                                            <t t-set="tax_amt" t-value="o.amount_tax or 0.0"/>
+                                            <t t-set="tax_rate"
+                                               t-value="(tax_amt and (tax_amt / (base_for_tax or 1.0) * 100.0)) or 0.0"/>
+                                            <tr>
+                                                <td>
+                                                    <t t-out="'Tax {:.0f}% on $ {:,.2f}'.format(tax_rate, base_for_tax)"/>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span t-out="tax_amt"
+                                                          t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+
+                                            <!-- separator line (confined to right column width) -->
+                                            <tr>
+                                                <td colspan="2" style="border-top:1px solid #000; height:1px;"> </td>
+                                            </tr>
+
+                                            <!-- Total -->
+                                            <tr>
+                                                <td>
+                                                    <strong>Total</strong>
+                                                </td>
+                                                <td class="text-end">
+                                                    <strong>
+                                                        <span t-field="o.amount_total"
+                                                              t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Amount in words (right side) -->
+                                    <div class="mb-2" style="margin-top:6px;">
+                                        <p class="text-end lh-sm"
+                                           t-if="o.company_id.display_invoice_amount_total_words"
+                                           style="overflow-wrap:anywhere; word-break:break-word; margin:0;">
+                                            Total amount in words:
+                                            <br/>
+                                            <small class="text-muted lh-sm">
+                                                <span t-field="o.amount_total_words"/>
+                                            </small>
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_invoice_new" model="ir.actions.report">
+        <field name="name">Commercial Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">purchase_commission.report_invoice_document_inherited</field>
+        <field name="report_file">purchase_commission.report_invoice_document_inherited</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
