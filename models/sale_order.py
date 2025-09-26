@@ -173,17 +173,21 @@ class SaleOrder(models.Model):
                 # create record in remote database
                 for vals in vals_list:
                     copied_vals = deepcopy(vals)
+                    # update vals to match remote db
                     if copied_vals.get('partner_id', False):
                         main_db_partner = self.env['res.partner'].browse(vals['partner_id'])
                         copied_vals['partner_id'] = main_db_partner.related_partner_id
                         copied_vals['partner_invoice_id'] = main_db_partner.related_partner_id
+                    # Handle case when sale order line is added at the time of sale order creation
                     if copied_vals.get('order_line', False):
                         for line in copied_vals['order_line']:
+                            # product template is to replaced by remote product tempate
                             line[2]['product_template_id'] = self.env['product.template'].browse(
                                 line[2]['product_template_id']).related_product_id
+                            # product is to be replaced by remote product
                             if line[2].get('product_id', False):
                                 line[2]["product_id"] = self.env['product.product'].search([('id', '=', line[2]['product_id'])]).remote_product_id
-
+                            # Handle case when product packaging is set
                             if line[2].get('product_packaging_id', False):
                                 main_db_packaging_id = self.env['product.packaging'].browse(
                                     line[2]['product_packaging_id'])
@@ -196,25 +200,30 @@ class SaleOrder(models.Model):
                                                                                {'limit': 1})
                                 line[2]['product_packaging_id'] = remote_packaging_id[
                                     0] if remote_packaging_id else False
-
+                    # TODO: need to handle this case of pricelist
                     if copied_vals.get('pricelist_id', False):
                         copied_vals.pop('pricelist_id')
+                    # create record in remote database with above prepared copied_vals
                     remote_id = remote_models.execute_kw(db, uid, password, 'sale.order', 'create', [copied_vals])
+
+                    # list sale order line ids from remote db for setting remote_sale_order_line_id in main db
+                    remote_sale_order_line_ids = remote_models.execute_kw(db, uid, password, 'sale.order.line',
+                                                                          'search', [[['order_id', '=', remote_id]]])
+                    # in main db we have to set remote_sale_order_line_id for each sale order line
+                    for rsol, msol in zip(remote_sale_order_line_ids, vals['order_line']):
+                        msol[2]['remote_sale_order_line_id'] = rsol
+                    # set remote_sale_order_id in main db vals
                     vals['remote_sale_order_id'] = remote_id
+                # create record in main db
                 new_sale_orders = super().create(vals_list)
+                # after creating record in main db search the record in remote db with partner_id and date_order and set remote_sale_order_id in remote db
                 for sale_order in new_sale_orders:
                     main_db_partner_id = sale_order.partner_id
                     remote_db_partner_id = main_db_partner_id.related_partner_id
                     quotation_date = sale_order.date_order
                     remote_sale_order_id = remote_models.execute_kw(db, uid, password, 'sale.order', 'search', [[['partner_id', '=', remote_db_partner_id], ['date_order', '=', quotation_date]]], {'limit': 1})
                     remote_models.execute_kw(db, uid, password, 'sale.order', 'write', [[remote_sale_order_id[0]], {'remote_sale_order_id': sale_order.id}])
-                    remote_sale_order_line_ids = remote_models.execute_kw(db, uid, password, 'sale.order.line', 'search', [[['order_id', '=', remote_sale_order_id[0]]]])
-                    sale_order_lines = self.env['sale.order.line'].search([('order_id', '=', sale_order.id)])
-                    for remote_sale_order_line, main_db_sale_order_line in zip(remote_sale_order_line_ids, sale_order_lines):
-                        print('Remote: ', remote_sale_order_line, 'Main', main_db_sale_order_line.id)
-                        main_db_sale_order_line.write({'remote_sale_order_line_id': remote_sale_order_line})
-                        remote_models.execute_kw(db, uid, password, 'sale.order.line', 'write', [[remote_sale_order_line], {'remote_sale_order_line_id': main_db_sale_order_line.id}])
-                return new_sale_orders
+                    return new_sale_orders
             except Exception as e:
                 _logger.error(f'Failed to connect to external server: {e}')
                 return super().create(vals_list)
@@ -222,7 +231,6 @@ class SaleOrder(models.Model):
             return super().create(vals_list)
 
     def write(self, vals):
-        res = super(SaleOrder, self).write(vals)
         if self._db_sync_enabled():
             _logger.warning('Data sync is enabled, attempting to sync partners to external DB')
             config = self._get_external_config()
@@ -237,12 +245,15 @@ class SaleOrder(models.Model):
                         _logger.info(f'Skipping sync for Sale Order {order.name} as it has no remote ID')
                         continue
                     update_vals = deepcopy(vals)
+                    # update vals to match remote db
                     if update_vals.get('partner_id', False):
                         main_db_partner = self.env['res.partner'].browse(vals['partner_id'])
                         update_vals['partner_id'] = main_db_partner.related_partner_id
                         update_vals['partner_invoice_id'] = main_db_partner.related_partner_id
+                    # Handle case when sale order line is added/updated at the time of sale order updation
                     if update_vals.get('order_line', False):
                         for line in update_vals['order_line']:
+                            # Handle case when adding new sale order line
                             if line[0] == 0:
                                 if line[2].get('product_template_id', False):
                                     line[2]['product_template_id'] = self.env['product.template'].browse(
@@ -258,35 +269,31 @@ class SaleOrder(models.Model):
                                     remote_packaging_id = remote_models.execute_kw(db, uid, password,'product.packaging', 'search', [[['product_id', '=', remote_product_id], ['qty', '=', qty]]],
                                                                                    {'limit': 1})
                                     line[2]['product_packaging_id'] = remote_packaging_id[0] if remote_packaging_id else False
+                            # Handle case when updating existing sale order line
                             if line[0] == 1:
                                 main_db_sale_order_line_id = line[1]
                                 main_db_sale_order_line = self.env['sale.order.line'].browse(main_db_sale_order_line_id)
-                                main_db_order_id = main_db_sale_order_line.order_id
-                                remote_db_order_id = main_db_order_id.remote_sale_order_id
-                                order_partner_id = main_db_sale_order_line.partner_id
-                                remote_order_partner_id = order_partner_id.related_partner_id
-                                product_id = main_db_sale_order_line.product_id
-                                remote_product_id = product_id.remote_product_id
-                                remote_db_sale_order_line_id = remote_models.execute_kw(db, uid, password,
-                                                                                        'sale.order.line', 'search'
-                                                                                        , [[['order_id', '=',
-                                                                                             remote_db_order_id],
-                                                                                            ['partner_id', '=',
-                                                                                             remote_order_partner_id],
-                                                                                            ['product_id', '=',
-                                                                                             remote_product_id]]],
-                                                                                        {'limit': 1})
-                                line[1] = remote_db_sale_order_line_id[0] if remote_db_sale_order_line_id else False
+                                remote_db_sale_order_line_id = main_db_sale_order_line.remote_sale_order_line_id
+                                line[1] = remote_db_sale_order_line_id if remote_db_sale_order_line_id else False
+                    # TODO : need to handle this case of pricelist
                     if update_vals.get('pricelist_id', False):
                         update_vals.pop('pricelist_id')
-                    print('writing with data:', update_vals)
+                    # with updated vals write to remote db
                     remote_models.execute_kw(db, uid, password, 'sale.order', 'write', [[order.remote_sale_order_id], update_vals])
-                    return res
+                    # in main db we have to set remote_sale_order_line_id for each sale order line
+                    main_sol_ids = [sale_order_line.remote_sale_order_line_id for sale_order_line in order.order_line]
+                    remote_sol_ids = remote_models.execute_kw(db, uid, password, 'sale.order.line', 'search', [[['order_id', '=', order.remote_sale_order_id]]])
+                    remote_sol_ids = list(set(remote_sol_ids) - set(main_sol_ids))
+                    if vals.get('order_line'):
+                        for i, rid in enumerate(remote_sol_ids):
+                            if i < len(vals['order_line']) and vals['order_line'][i][2]:
+                                vals['order_line'][i][2]['remote_sale_order_line_id'] = rid
+                    return super(SaleOrder, self).write(vals)
             except Exception as e:
                 _logger.error(f'Failed to connect to external server: {e}')
         else:
             _logger.info('Data sync is disabled, skipping external DB update')
-            return res
+            return super(SaleOrder, self).write(vals)
 
 
 

@@ -52,9 +52,13 @@
             <xpath expr="//field[@name='vat']" position="attributes">
                 <attribute name="invisible">true</attribute>
             </xpath>
-            <xpath expr="//field[@name='vat']" position="after">
+            <xpath expr="//field[@name='category_id']" position="attributes">
+                <attribute name="invisible">true</attribute>
+            </xpath>
+            <xpath expr="//field[@name='phone']" position="before">
                 <field name="partner_type"/>
             </xpath>
+
         </field>
     </record>
 
