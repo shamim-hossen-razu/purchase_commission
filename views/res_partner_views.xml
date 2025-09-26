@@ -49,6 +49,12 @@
             <xpath expr="//field[@name='vat']" position="after">
                 <field name="related_partner_id" readonly="True"/>
             </xpath>
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="invisible">true</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="partner_type"/>
+            </xpath>
         </field>
     </record>
 

@@ -10,6 +10,11 @@ from copy import deepcopy
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    # company_type is only an interface field, do not use it in business logic
+    partner_type = fields.Selection(string='Company Type',
+                                    selection=[('customer', 'Customer'), ('supplier', 'Supplier')],
+                                    default='customer')
+
     partner_commission_ids = fields.One2many(
         'customer.commission', 'partner_id', string='Customer Commissions')
     related_partner_id = fields.Integer(string='Related Partner ID')
@@ -72,6 +77,14 @@ class ResPartner(models.Model):
         if single_record:
             vals_list = [vals_list]
 
+        for partner in vals_list:
+            if partner.get('partner_type', False):
+                if partner['partner_type'] == 'customer':
+                    partner['customer_rank'] = 1
+                    partner['supplier_rank'] = 0
+                elif partner['partner_type'] == 'supplier':
+                    partner['supplier_rank'] = 1
+                    partner['customer_rank'] = 0
         if self._db_sync_enabled():
             _logger.warning('Data sync is enabled, attempting to sync partners to external DB')
             config = self._get_external_config()
