@@ -24,6 +24,10 @@
                        position="attributes">
                     <attribute name="invisible">true</attribute>
                 </xpath>
+
+                <xpath expr="//header/button[@name='action_cancel']" position="after">
+                    <button name="action_send_whatsapp_msg" string="Whatsapp" type="object" class="oe_stat_button"/>
+                </xpath>
             </field>
         </record>
 

@@ -6,3 +6,4 @@ access_division,access_division,model_bangladesh_divisions,base.group_user,1,0,0
 access_district,access_district,model_bangladesh_districts,base.group_user,1,0,0,0
 access_upazila,access_upazila,model_bangladesh_upazilas,base.group_user,1,0,0,0
 access_union,access_union,model_bangladesh_unions,base.group_user,1,0,0,0
+access_send_whatsapp_sale_wizard,access_send_whatsapp_sale_wizard,model_send_whatsapp_sale_wizard,,1,1,1,1
