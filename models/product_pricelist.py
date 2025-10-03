@@ -66,12 +66,9 @@ class Pricelist(models.Model):
                     vals['remote_pricelist_id'] = existing[0]
                 else:
                     try:
-                        remote_id = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'create', [copied], {'context': {'from_rpc': True}})
-                    except xmlrpc.client.Fault as fault:
-                        if "vals_list" in str(fault):
-                            remote_id = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'create', [copied])
-                        else:
-                            raise
+                        remote_id = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'create', [vals])
+                    except Exception as e:
+                        raise ValidationError(f"Failed to connect to external server: {e}")
                     vals['remote_pricelist_id'] = remote_id
 
             records = super().create(vals_list)
