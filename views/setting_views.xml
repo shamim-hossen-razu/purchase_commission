@@ -22,7 +22,13 @@
                                 <field name="external_server_uid" placeholder="User ID"/>
                             </div>
                             <div class="mt8">
+                                <field name="external_server_user_name" placeholder="User Name"/>
+                            </div>
+                            <div class="mt8">
                                 <field name="external_server_password" placeholder="Password" password="1"/>
+                            </div>
+                            <div>
+                                <button name="test_connection" type="object" string="Test Connection" class="btn-primary"/>
                             </div>
                         </div>
                     </setting>

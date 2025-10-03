@@ -52,8 +52,7 @@
         'views/hide_menues_from_sales_setting.xml',
         'views/product_variant_views.xml',
         'views/sale_order_template_inherit.xml',
-        'views/product_pricelist_views.xml',
-        'views/product_pricelist_item_views.xml',
+        'views/product_pricelist.xml',
         'wizard/send_whatsapp_sale_wizard_views.xml',
     ],
     # only loaded in demonstration mode

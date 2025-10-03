@@ -1,4 +1,4 @@
-from odoo import models, api, fields, _
+from odoo import models, api, fields
 from odoo.tools.misc import format_amount
 import re
 import xmlrpc.client
@@ -294,6 +294,30 @@ class SaleOrder(models.Model):
         else:
             _logger.info('Data sync is disabled, skipping external DB update')
             return super(SaleOrder, self).write(vals)
+
+    def unlink(self):
+        if self._db_sync_enabled():
+            _logger.warning('Data sync is enabled, attempting to delete partners from external DB')
+            config = self._get_external_config()
+            url = config['url']
+            db = config['db']
+            uid = config['uid']
+            password = config['password']
+            try:
+                remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+                for order in self:
+                    if not order.remote_sale_order_id:
+                        _logger.info(f'Skipping sync for Sale Order {order.name} as it has no remote ID')
+                        continue
+                    remote_models.execute_kw(db, uid, password, 'sale.order', 'unlink', [[order.remote_sale_order_id]])
+                return super(SaleOrder, self).unlink()
+            except Exception as e:
+                _logger.error(f'Failed to connect to external server: {e}')
+                return super(SaleOrder, self).unlink()
+        else:
+            _logger.info('Data sync is disabled, skipping external DB deletion')
+            return super(SaleOrder, self).unlink()
+
 
     def action_send_whatsapp_msg(self):
         """This function is called when the user clicks the 'Send WhatsApp Message' button on a sale order/quotation's form view. It opens a new

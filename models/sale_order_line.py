@@ -1,4 +1,8 @@
 from odoo import api, fields, models
+import xmlrpc.client
+import logging
+_logger = logging.getLogger(__name__)
+
 
 
 class SaleOrderLine(models.Model):
@@ -50,3 +54,36 @@ class SaleOrderLine(models.Model):
                     rec.product_uom_qty = (packs * base_qty) + pieces
             except ValueError:
                 rec.product_uom_qty = 0
+
+    def _get_external_config(self):
+        ICP = self.env['ir.config_parameter'].sudo()
+        return {
+            'url': ICP.get_param('purchase_commission.external_server_url', ''),
+            'db': ICP.get_param('purchase_commission.external_server_db', ''),
+            'uid': int(ICP.get_param('purchase_commission.external_server_uid', 0)),
+            'password': ICP.get_param('purchase_commission.external_server_password', '')
+        }
+
+    def _db_sync_enabled(self):
+        # if data_sync is true return true else false
+        ICP = self.env['ir.config_parameter'].sudo()
+        return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
+
+
+    def unlink(self):
+        if self._db_sync_enabled():
+            config = self._get_external_config()
+            models = xmlrpc.client.ServerProxy(f"{config['url']}/xmlrpc/2/object")
+            for rec in self:
+                if rec.remote_sale_order_line_id:
+                    try:
+                        models.execute_kw(
+                            config['db'], config['uid'], config['password'],
+                            'sale.order.line', 'unlink',
+                            [[rec.remote_sale_order_line_id]]
+                        )
+                        _logger.info('Successfully deleted remote sale order line with ID %s', rec.remote_sale_order_line_id)
+                    except Exception as e:
+                        # Log the exception or handle it as needed
+                        _logger.error(f"Failed to delete remote sale order line {rec.remote_sale_order_line_id}: {e}")
+        return super(SaleOrderLine, self).unlink()
