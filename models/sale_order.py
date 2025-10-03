@@ -202,7 +202,10 @@ class SaleOrder(models.Model):
                                     0] if remote_packaging_id else False
                     # TODO: need to handle this case of pricelist
                     if copied_vals.get('pricelist_id', False):
-                        copied_vals.pop('pricelist_id')
+                        main_db_pricelist_id = self.env['product.pricelist'].browse(copied_vals['pricelist_id'])
+                        remote_db_pricelist_id = main_db_pricelist_id.remote_pricelist_id
+                        copied_vals['pricelist_id'] = remote_db_pricelist_id if remote_db_pricelist_id else False
+
                     # create record in remote database with above prepared copied_vals
                     remote_id = remote_models.execute_kw(db, uid, password, 'sale.order', 'create', [copied_vals])
 
@@ -277,7 +280,9 @@ class SaleOrder(models.Model):
                                 line[1] = remote_db_sale_order_line_id if remote_db_sale_order_line_id else False
                     # TODO : need to handle this case of pricelist
                     if update_vals.get('pricelist_id', False):
-                        update_vals.pop('pricelist_id')
+                        main_db_pricelist_id = self.env['product.pricelist'].browse(update_vals['pricelist_id'])
+                        remote_db_pricelist_id = main_db_pricelist_id.remote_pricelist_id
+                        update_vals['pricelist_id'] = remote_db_pricelist_id if remote_db_pricelist_id else False
                     # with updated vals write to remote db
                     remote_models.execute_kw(db, uid, password, 'sale.order', 'write', [[order.remote_sale_order_id], update_vals])
                     # in main db we have to set remote_sale_order_line_id for each sale order line
