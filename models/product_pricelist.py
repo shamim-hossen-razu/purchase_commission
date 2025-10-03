@@ -33,6 +33,7 @@ class ProductPricelist(models.Model):
             db = config['db']
             uid = config['uid']
             password = config['password']
+            res = super(ProductPricelist, self).write(vals)
             try:
                 remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
                 print('vals', vals)
@@ -59,35 +60,48 @@ class ProductPricelist(models.Model):
                             remote_vals.pop('company_id', None)
                     if remote_vals.get('item_ids', False):
                         for item in remote_vals['item_ids']:
-                            if item[2].get('categ_id', False):
-                                categ_id = self.env['product.category'].browse(item[2]['categ_id'])
-                                remote_categ_id = categ_id.remote_category_id
-                                if remote_categ_id:
-                                    item[2]['categ_id'] = remote_categ_id
-                                else:
-                                    item[2]['categ_id'] = False
-                            if item[2].get('product_tmpl_id', False):
-                                product_tmpl_id = self.env['product.template'].browse(item[2]['product_tmpl_id'])
-                                remote_product_tmpl_id = product_tmpl_id.related_product_id
-                                if remote_product_tmpl_id:
-                                    item[2]['product_tmpl_id'] = remote_product_tmpl_id
-                                else:
-                                    item[2]['product_tmpl_id'] = False
-                            if item[2].get('product_id', False):
-                                main_db_product_id = self.env['product.product'].browse(item[2].get('product_id'))
-                                remote_product_id = main_db_product_id.remote_product_id
-                                if remote_product_id:
-                                    item[2]['product_id'] = remote_product_id
-                                else:
-                                    item[2]['product_id'] = False
-                            if item[2].get('pricelist_id', False):
-                                item[2]['pricelist_id'] = pricelist.remote_pricelist_id
-                    print('remote data', remote_vals)
-                    remote_models.execute_kw(db, uid, password, 'product.pricelist', 'write',
-                                             [[pricelist.remote_pricelist_id], remote_vals])
-
-                return super(ProductPricelist, self).write(vals)
+                            if len(item) == 3 and item[0] == 0:
+                                if item[2].get('categ_id', False):
+                                    categ_id = self.env['product.category'].browse(item[2]['categ_id'])
+                                    remote_categ_id = categ_id.remote_category_id
+                                    if remote_categ_id:
+                                        item[2]['categ_id'] = remote_categ_id
+                                    else:
+                                        item[2]['categ_id'] = False
+                                if item[2].get('product_tmpl_id', False):
+                                    product_tmpl_id = self.env['product.template'].browse(item[2]['product_tmpl_id'])
+                                    remote_product_tmpl_id = product_tmpl_id.related_product_id
+                                    if remote_product_tmpl_id:
+                                        item[2]['product_tmpl_id'] = remote_product_tmpl_id
+                                    else:
+                                        item[2]['product_tmpl_id'] = False
+                                if item[2].get('product_id', False):
+                                    main_db_product_id = self.env['product.product'].browse(item[2].get('product_id'))
+                                    remote_product_id = main_db_product_id.remote_product_id
+                                    if remote_product_id:
+                                        item[2]['product_id'] = remote_product_id
+                                    else:
+                                        item[2]['product_id'] = False
+                                if item[2].get('pricelist_id', False):
+                                    item[2]['pricelist_id'] = pricelist.remote_pricelist_id
+                return res
             except Exception as e:
                 _logger.error(f"Failed to sync pricelist to external DB: {e}")
         return super(ProductPricelist, self).write(vals)
 
+    def sync_daya(self):
+        if self._db_sync_enabled():
+            config = self._get_external_config()
+            url = config['url']
+            db = config['db']
+            uid = config['uid']
+            password = config['password']
+            remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
+            for pricelist in self:
+                if pricelist.remote_pricelist_id:
+                    main_db_pricelist_items = self.env['product.pricelist.item'].search(
+                        [('pricelist_id', '=', pricelist.id)])
+                    remote_db_pricelist_items = remote_models.execute_kw(db, uid, password,
+                                                                        'product.pricelist.item', 'search_read',
+                                                                        [[['pricelist_id', '=', pricelist.remote_pricelist_id]]],
+                                                                        {'fields': ['id', 'remote_pricelist_item_id']})
