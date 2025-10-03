@@ -14,7 +14,7 @@ class Pricelist(models.Model):
         return {
             'url': ICP.get_param('purchase_commission.external_server_url', ''),
             'db': ICP.get_param('purchase_commission.external_server_db', ''),
-            'uid': ICP.get_param('purchase_commission.external_server_uid', ''),
+            'uid': int(ICP.get_param('purchase_commission.external_server_uid', '')),
             'password': ICP.get_param('purchase_commission.external_server_password', ''),
         }
 
@@ -23,77 +23,72 @@ class Pricelist(models.Model):
 
         return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
 
+    @api.model_create_multi
     def create(self, vals_list):
         """ This helper function handles the creation of a pricelist from local database to original databases """
-
         single = isinstance(vals_list, dict)
         if single:
             vals_list = [vals_list]
 
-        if not self._db_sync_enabled():
-            return super().create(vals_list)
+        if self._db_sync_enabled():
 
-        cfg = self._get_external_config()
-        try:
-            models_rpc = xmlrpc.client.ServerProxy(f"{cfg['url']}/xmlrpc/2/object")
-        except Exception as e:
-            raise ValidationError(f"Failed to connect to external server: {e}")
+            cfg = self._get_external_config()
+            try:
+                models_rpc = xmlrpc.client.ServerProxy(f"{cfg['url']}/xmlrpc/2/object")
+            except Exception as e:
+                raise ValidationError(f"Failed to connect to external server: {e}")
 
-        for vals in vals_list:
-            copied = deepcopy(vals)
 
-            if copied.get('currency_id'):
-                currency = self.env['res.currency'].browse(copied['currency_id'])
-                remote_currency = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'res.currency', 'search', [[['name', '=', currency.name]]], {'limit': 1})
+            # -------- Prepare remote payloads -------- #
+            for vals in vals_list:
+                copied = deepcopy(vals)
+                if not isinstance(copied, dict):
+                    raise ValueError("copied must be a dict")
+                print(copied)
+                if copied.get('currency_id'):
+                    currency = self.env['res.currency'].browse(copied['currency_id'])
+                    remote_currency = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'res.currency', 'search', [[['name', '=', currency.name]]], {'limit': 1})
 
-                if remote_currency:
-                    copied['currency_id'] = remote_currency[0]
+                    if remote_currency:
+                        copied['currency_id'] = remote_currency[0]
+                    else:
+                        copied.pop('currency_id', None)
+
+                if copied.get('item_ids'):
+                    for cmd in copied['item_ids']:
+                        if len(cmd) > 2 and cmd[0] == 0 and isinstance(cmd[2], dict):
+                            self._pl_mapping_vals_create_remote(cmd[2], models_rpc, cfg)
+
+                print(copied)
+
+                existing = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'search', [[['name', '=ilike', copied.get('name')]]], {'limit': 1})
+                if existing:
+                    vals['remote_pricelist_id'] = existing[0]
                 else:
-                    copied.pop('currency_id', None)
+                    try:
+                        remote_id = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'create', [copied], {'context': {'from_rpc': True}})
+                    except xmlrpc.client.Fault as fault:
+                        if "vals_list" in str(fault):
+                            remote_id = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'create', [copied])
+                        else:
+                            raise
+                    vals['remote_pricelist_id'] = remote_id
 
-            if copied.get('item_ids'):
-                for cmd in copied['item_ids']:
-                    if len(cmd) > 2 and cmd[0] == 0 and isinstance(cmd[2], dict):
-                        self._pl_mapping_vals_create_remote(cmd[2], models_rpc, cfg)
+            records = super().create(vals_list)
 
-            existing = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'search', [[['name', '=ilike', copied.get('name')]]], {'limit': 1})
-            if existing:
-                vals['remote_pricelist_id'] = existing[0]
-            else:
-                remote_id = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.pricelist', 'create', [copied])
-                vals['remote_pricelist_id'] = remote_id
-
-        records = super().create(vals_list)
-
-        for record in records:
-            if not record.remote_pricelist_id:
-                continue
-
-            try:
-                models_rpc.execute_kw(
-                    cfg['db'], cfg['uid'], cfg['password'],
-                    'product.pricelist', 'write',
-                    [[record.remote_pricelist_id], {'remote_pricelist_id': record.id}]
-                )
-            except Exception as e:
-                raise ValidationError(f"Could not write back local ref to remote pricelist {record.id}: {e}")
-
-            try:
-                r_item_ids = models_rpc.execute_kw(
-                    cfg['db'], cfg['uid'], cfg['password'],
-                    'product.pricelist.item', 'search',
-                    [[['pricelist_id', '=', record.remote_pricelist_id]]]
-                )
-                for r_id, m_item in zip(r_item_ids, record.item_ids):
-                    m_item.remote_pricelist_item_id = r_id
-                    models_rpc.execute_kw(
-                        cfg['db'], cfg['uid'], cfg['password'],
-                        'product.pricelist.item', 'write',
-                        [[r_id], {'remote_pricelist_item_id': m_item.id}]
-                    )
-            except Exception as e:
-                raise ValidationError(f"Failed to map pricelist items for {record.name}: {e}")
-
+            for record in records:
+                if  record.remote_pricelist_id:
+                    try:
+                        remote_pricelist_id = models_rpc.execute_kw(
+                            cfg['db'], cfg['uid'], cfg['password'],
+                            'product.pricelist', 'search',
+                            [[['name', '=ilike', record.name]]], {'limit': 1})
+                        record.write({'remote_pricelist_id': remote_pricelist_id})
+                    except Exception as e:
+                        raise ValidationError(f"Could not write back local reference id to remote pricelist {record.id}: {e}")
+            return records
+        else:
+            super().create(vals_list)
 
     def _pl_mapping_vals_create_remote(self, vals, models_rpc, cfg):
         """ This helper function handles the related fields of pricelists and maps, cleans values to create on remote servers """
@@ -131,7 +126,7 @@ class Pricelist(models.Model):
         if vals.get('categ_id'):
             cat = self.env['product.category'].browse(vals['categ_id'])
             if not cat.remote_category_id or cat.remote_category_id == 0:
-                remote_ids = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.category', 'search', [{'name': cat.name}])
+                remote_ids = models_rpc.execute_kw(cfg['db'], cfg['uid'], cfg['password'], 'product.category', 'search', [[['name', '=', cat.name]]], {'limit': 1})
 
                 if remote_ids:
                     cat.remote_category_id = remote_ids[0]
