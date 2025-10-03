@@ -319,5 +319,18 @@ class SaleOrder(models.Model):
             return super(SaleOrder, self).unlink()
 
 
+    def action_send_whatsapp_msg(self):
+        """This function is called when the user clicks the 'Send WhatsApp Message' button on a sale order/quotation's form view. It opens a new
+        wizard to compose and send a WhatsApp message."""
 
-
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('WhatsApp Message'),
+            'res_model': 'send.whatsapp.sale.wizard',
+            'target': 'new',
+            'view_mode': 'form',
+            'context': {
+                'default_order_id': self.id,
+                'default_partner_id': self.partner_id.id,
+            }
+        }
