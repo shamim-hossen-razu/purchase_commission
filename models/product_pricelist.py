@@ -83,4 +83,4 @@ class Pricelist(models.Model):
                         raise ValidationError(f"Could not write back local reference id to remote pricelist {record.id}: {e}")
             return records
         else:
-            super().create(vals_list)
+            return super().create(vals_list)
