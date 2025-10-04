@@ -5,12 +5,23 @@
         <field name="model">product.pricelist</field>
         <field name="inherit_id" ref="product.product_pricelist_view"/>
         <field name="arch" type="xml">
+
             <xpath expr="//field[@name='country_group_ids']" position="attributes">
                 <attribute name="invisible">true</attribute>
             </xpath>
             <xpath expr="//field[@name='currency_id']" position="after">
                 <field name="remote_pricelist_id"/>
             </xpath>
+
+            <xpath expr="//button[@name='action_open_pricelist_report']" position="after">
+                <button name="sync_pricelist" type="object" string="Sync Pricelist" class="btn-primary"/>
+            </xpath>
+            <xpath expr="//notebook//page[@name='pricelist_rules']//field[@name='item_ids']//list//field[@name='product_tmpl_id']" position="after">
+                <field name="remote_pricelist_item_id" string="sync id" readonly="1"/>
+            </xpath>
+<!--            <xpath expr="//notebook//page[@name='pricelist_rules']//field[@name='item_ids']//list//field[@name='product_tmpl_id']" position="after">-->
+<!--                <field name="id" readonly="1"/>-->
+<!--            </xpath>-->
         </field>
     </record>
 

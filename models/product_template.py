@@ -169,7 +169,7 @@ class ProductTemplate(models.Model):
     def write(self, vals):
         vals.pop('combo_ids', None)
         for rec in self:
-            if rec._db_sync_enabled() and rec.related_product_id:
+            if rec._db_sync_enabled():
                 config = rec._get_external_config()
                 url = config['url']
                 db = config['db']

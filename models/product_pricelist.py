@@ -33,10 +33,8 @@ class ProductPricelist(models.Model):
             db = config['db']
             uid = config['uid']
             password = config['password']
-            res = super(ProductPricelist, self).write(vals)
             try:
                 remote_models = xmlrpc.client.ServerProxy(f'{url}/xmlrpc/2/object')
-                print('vals', vals)
                 for pricelist in self:
                     remote_vals = deepcopy(vals)
                     if 'name' in remote_vals:
@@ -59,7 +57,7 @@ class ProductPricelist(models.Model):
                         else:
                             remote_vals.pop('company_id', None)
                     if remote_vals.get('item_ids', False):
-                        for item in remote_vals['item_ids']:
+                        for i, item in enumerate(remote_vals['item_ids']):
                             if len(item) == 3 and item[0] == 0:
                                 if item[2].get('categ_id', False):
                                     categ_id = self.env['product.category'].browse(item[2]['categ_id'])
@@ -68,6 +66,8 @@ class ProductPricelist(models.Model):
                                         item[2]['categ_id'] = remote_categ_id
                                     else:
                                         item[2]['categ_id'] = False
+                                        del vals['item_ids'][i]
+                                        logging.info("This category is not synced yet. Please sync the category first before adding to pricelist item.")
                                 if item[2].get('product_tmpl_id', False):
                                     product_tmpl_id = self.env['product.template'].browse(item[2]['product_tmpl_id'])
                                     remote_product_tmpl_id = product_tmpl_id.related_product_id
@@ -75,6 +75,9 @@ class ProductPricelist(models.Model):
                                         item[2]['product_tmpl_id'] = remote_product_tmpl_id
                                     else:
                                         item[2]['product_tmpl_id'] = False
+                                        logging.error("Product Template must be synced before adding to pricelist item.")                                        # if product template is not synced remove this item from vals
+                                        del vals['item_ids'][i]
+
                                 if item[2].get('product_id', False):
                                     main_db_product_id = self.env['product.product'].browse(item[2].get('product_id'))
                                     remote_product_id = main_db_product_id.remote_product_id
@@ -82,14 +85,66 @@ class ProductPricelist(models.Model):
                                         item[2]['product_id'] = remote_product_id
                                     else:
                                         item[2]['product_id'] = False
+                                        del vals['item_ids'][i]
+                                        logging.info('This product is not synced yet. Please sync the product first before adding to pricelist item.')
                                 if item[2].get('pricelist_id', False):
                                     item[2]['pricelist_id'] = pricelist.remote_pricelist_id
-                return res
+                            if len(item) == 3 and item[0] == 1:
+                                remote_pricelist_item_id = self.env['product.pricelist.item'].browse(item[1]).remote_pricelist_item_id
+                                if remote_pricelist_item_id:
+                                    item[1] = remote_pricelist_item_id
+                                else:
+                                    logging.error("Pricelist item must be synced before updating.")
+                                    del vals['item_ids'][i]
+                                if item[2].get('categ_id', False):
+                                    categ_id = self.env['product.category'].browse(item[2]['categ_id'])
+                                    remote_categ_id = categ_id.remote_category_id
+                                    if remote_categ_id:
+                                        item[2]['categ_id'] = remote_categ_id
+                                    else:
+                                        item[2]['categ_id'] = False
+                                        del vals['item_ids'][i]
+                                        logging.info(
+                                            "This category is not synced yet. Please sync the category first before adding to pricelist item.")
+                                if item[2].get('product_tmpl_id', False):
+                                    product_tmpl_id = self.env['product.template'].browse(item[2]['product_tmpl_id'])
+                                    remote_product_tmpl_id = product_tmpl_id.related_product_id
+                                    if remote_product_tmpl_id:
+                                        item[2]['product_tmpl_id'] = remote_product_tmpl_id
+                                    else:
+                                        item[2]['product_tmpl_id'] = False
+                                        logging.error(
+                                            "Product Template must be synced before adding to pricelist item.")  # if product template is not synced remove this item from vals
+                                        del vals['item_ids'][i]
+
+                                if item[2].get('product_id', False):
+                                    main_db_product_id = self.env['product.product'].browse(item[2].get('product_id'))
+                                    remote_product_id = main_db_product_id.remote_product_id
+                                    if remote_product_id:
+                                        item[2]['product_id'] = remote_product_id
+                                    else:
+                                        item[2]['product_id'] = False
+                                        del vals['item_ids'][i]
+                                        logging.info(
+                                            'This product is not synced yet. Please sync the product first before adding to pricelist item.')
+                                if item[2].get('pricelist_id', False):
+                                    item[2]['pricelist_id'] = pricelist.remote_pricelist_id
+                            if len(item) == 2 and item[0] == 2:
+                                remote_pricelist_item_id = self.env['product.pricelist.item'].browse(item[1]).remote_pricelist_item_id
+                                if remote_pricelist_item_id:
+                                    item[1] = remote_pricelist_item_id
+                                else:
+                                    logging.error("Pricelist item must be synced before deleting.")
+                                    del vals['item_ids'][i]
+                    print('Remote Vals:', remote_vals)
+                    remote_models.execute_kw(db, uid, password, 'product.pricelist', 'write', [[pricelist.remote_pricelist_id], remote_vals])
+                return super(ProductPricelist, self).write(vals)
+
             except Exception as e:
                 _logger.error(f"Failed to sync pricelist to external DB: {e}")
         return super(ProductPricelist, self).write(vals)
 
-    def sync_daya(self):
+    def sync_pricelist(self):
         if self._db_sync_enabled():
             config = self._get_external_config()
             url = config['url']
@@ -104,4 +159,14 @@ class ProductPricelist(models.Model):
                     remote_db_pricelist_items = remote_models.execute_kw(db, uid, password,
                                                                         'product.pricelist.item', 'search_read',
                                                                         [[['pricelist_id', '=', pricelist.remote_pricelist_id]]],
-                                                                        {'fields': ['id', 'remote_pricelist_item_id']})
+                                                                         {'fields':['id']})
+                    remote_db_pricelist_item_ids = [item['id'] for item in remote_db_pricelist_items]
+                    main_db_pricelist_item_ids = [item.id for item in main_db_pricelist_items]
+                    for remote_id, main_id in zip(remote_db_pricelist_item_ids, main_db_pricelist_item_ids):
+                        try:
+                            remote_models.execute_kw(db, uid, password, 'product.pricelist.item', 'write',
+                                                        [[remote_id], {'remote_pricelist_item_id' : main_id}])
+                            _logger.info(f'Successfully updated remote pricelist item {remote_id} with main DB ID {main_id}')
+                        except Exception as e:
+                            _logger.error(f"Failed to update remote pricelist item {remote_id}: {e}")
+                        self.env['product.pricelist.item'].browse(main_id).write({'remote_pricelist_item_id' : remote_id})
