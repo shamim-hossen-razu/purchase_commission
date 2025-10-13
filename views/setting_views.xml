@@ -32,6 +32,14 @@
                             </div>
                         </div>
                     </setting>
+                    <setting>
+                        <field name="sale_sync"/>
+                        <div class="content-group" invisible="not sale_sync" required="sale_sync">
+                            <div class="mt8">
+                                <field name="sale_decreased_percentage" placeholder="Percentage"/>
+                            </div>
+                        </div>
+                    </setting>
                 </block>
             </xpath>
         </field>

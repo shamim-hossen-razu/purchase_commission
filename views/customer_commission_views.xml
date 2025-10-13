@@ -50,6 +50,7 @@
                 <field name="partner_id"/>
                 <field name="fiscal_year_id"/>
                 <field name="total_purchase" sum="Total"/>
+                <field name="total_own_product_purchase" sum="Total"/>
                 <field name="total_invoiced" sum="Total"/>
                 <field name="total_paid" sum="Total"/>
                 <field name="total_due" sum="Total"/>

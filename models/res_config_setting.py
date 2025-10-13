@@ -31,6 +31,18 @@ class ResConfigSettings(models.TransientModel):
         default=False
     )
 
+    sale_decreased_percentage = fields.Float(
+        string='Sale Decreased Percentage',
+        config_parameter='purchase_commission.sale_decreased_percentage',
+        default=0.0
+    )
+
+    sale_sync = fields.Boolean(
+        string='Sale Sync',
+        config_parameter='purchase_commission.sale_sync',
+        default=False
+    )
+
     bd_format_address = fields.Boolean(
         string='BD Format Address',
         config_parameter='purchase_commission.bd_format_address',

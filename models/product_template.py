@@ -37,6 +37,20 @@ class ProductTemplate(models.Model):
         ICP = self.env['ir.config_parameter'].sudo()
         return ICP.get_param('purchase_commission.data_sync', 'False') == 'True'
 
+    def _sale_sync_enabled(self):
+        # if sale_sync is true return true else false
+        ICP = self.env['ir.config_parameter'].sudo()
+        return ICP.get_param('purchase_commission.sale_sync', 'False') == 'True'
+
+    def _sales_decreased_percentage(self):
+        ICP = self.env['ir.config_parameter'].sudo()
+        decrease_percentage = ICP.get_param('purchase_commission.sale_decreased_percentage', 0.0)
+        try:
+            decrease_percentage = float(decrease_percentage)
+        except ValueError:
+            decrease_percentage = 0.0
+        return decrease_percentage
+
     @api.model
     def create(self, vals_list):
         """Handle both single and multiple record creation during import"""
@@ -129,6 +143,16 @@ class ProductTemplate(models.Model):
                             category = self.env['product.category'].browse(category_id)
                             if category.remote_category_id:
                                 copied_vals['categ_id'] = category.remote_category_id
+                        if copied_vals.get('list_price', False) and self._sale_sync_enabled():
+                            decrease_percentage = self._sales_decreased_percentage()
+                            original_price = copied_vals['list_price']
+                            decreased_price = original_price - (original_price * decrease_percentage / 100)
+                            copied_vals['list_price'] = decreased_price
+                        if copied_vals.get('standard_price', False) and self._sale_sync_enabled():
+                            decrease_percentage = self._sales_decreased_percentage()
+                            original_price = copied_vals['standard_price']
+                            decreased_price = original_price - (original_price * decrease_percentage / 100)
+                            copied_vals['standard_price'] = decreased_price
                         remote_models.execute_kw(db, uid, password, 'product.template', 'create', [copied_vals])
                 except Exception as e:
                     raise ValidationError(f"Error during creating product in remote database: {e}")

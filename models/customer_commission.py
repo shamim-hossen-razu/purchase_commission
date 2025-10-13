@@ -26,6 +26,8 @@ class CustomerCommission(models.Model):
         string='Fiscal Year',
         help="Fiscal year for which this commission is recorded"
     )
+    total_own_product_purchase = fields.Float(string='Total Own Product Purchases This Year',
+                                              compute='_compute_total_own_product_purchase')
     total_purchase = fields.Float(string='Total Purchases This Year', compute='_compute_total_purchase')
     total_invoiced = fields.Float(string='Total Invoiced This Year', compute='_compute_total_invoiced')
     total_paid = fields.Float(string='Total Paid This Year', compute='_compute_total_paid')
@@ -78,11 +80,11 @@ class CustomerCommission(models.Model):
             if record.commission_rule_id:
                 commission_percent = record.commission_rule_id.commission_percent / 100.0
                 # Commission based on total invoiced amount
-                record.commission_amount = record.total_invoiced * commission_percent
+                record.commission_amount = record.total_own_product_purchase * commission_percent
             else:
                 record.commission_amount = 0.0
 
-    @api.onchange('partner_id', 'fiscal_year_id', 'total_purchase', 'total_invoiced', 'total_paid', 'total_due')
+    @api.onchange('partner_id', 'fiscal_year_id', 'total_purchase', 'total_invoiced', 'total_paid', 'total_due', 'total_own_product_purchase')
     def update_commission_rule(self):
         self.action_update_commission_rules()
 
@@ -90,7 +92,7 @@ class CustomerCommission(models.Model):
         for record in self:
             if record.partner_id and record.fiscal_year_id:
                 commission_rules = self.env['customer.commission.config'].search([
-                    ('purchase_target', '<=', record.total_invoiced),
+                    ('purchase_target', '<=', record.total_own_product_purchase),
                     ('company_id', '=', record.company_id.id),
                     ('fiscal_year_id', '=', record.fiscal_year_id.id),
                     ('active', '=', True)
@@ -125,6 +127,28 @@ class CustomerCommission(models.Model):
             record._compute_total_due()
             record.action_update_commission_rules()
             record._compute_commission_amount()
+
+    @api.depends('partner_id', 'fiscal_year_id')
+    def _compute_total_own_product_purchase(self):
+        for record in self:
+            if record.partner_id and record.fiscal_year_id:
+                start_date = record.fiscal_year_id.date_from
+                end_date = record.fiscal_year_id.date_to
+                sales_orders = self.env['sale.order'].search([
+                    ('partner_id', '=', record.partner_id.id),
+                    ('date_order', '>=', start_date),
+                    ('date_order', '<=', end_date),
+                    ('state', 'in', ['sale'])
+                ])
+                # product_template_category 'own_product' is used to identify own products
+                own_product_category = self.env['product.category'].search([('name', '=', 'Own Product')], limit=1)
+                if own_product_category:
+                    own_product_lines = sales_orders.mapped('order_line').filtered(
+                        lambda line: line.product_id.categ_id == own_product_category
+                    )
+                    record.total_own_product_purchase = sum(own_product_lines.mapped('price_total'))
+            else:
+                record.total_own_product_purchase = 0.0
 
     @api.depends('partner_id', 'fiscal_year_id')
     def _compute_total_purchase(self):

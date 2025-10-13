@@ -12,7 +12,7 @@ class CustomerDiscountConfig(models.Model):
 
     name = fields.Char(string='Rule Name', compute='_compute_name', store=True, readonly=False, tracking=True)
     purchase_target = fields.Float(string='Purchase Target', copy=False, tracking=True)
-    commission_percent = fields.Float(string='Discount %', required=True, tracking=True)
+    commission_percent = fields.Float(string='Commission %', required=True, tracking=True)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env.company, tracking=True)
