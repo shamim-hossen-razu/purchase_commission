@@ -24,6 +24,23 @@
                        position="attributes">
                     <attribute name="invisible">true</attribute>
                 </xpath>
+                <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='price_unit']"
+                       position="attributes">
+                    <attribute name="readonly">true</attribute>
+                </xpath>
+                <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='discount']"
+                       position="attributes">
+                    <attribute name="readonly">true</attribute>
+                </xpath>
+                <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='product_packaging_qty']"
+                       position="attributes">
+                    <attribute name="invisible">true</attribute>
+                </xpath>
+                <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='tax_id']"
+                       position="attributes">
+                    <attribute name="invisible">true</attribute>
+                </xpath>
+
 
                 <xpath expr="//header/button[@name='action_cancel']" position="after">
                     <button name="action_send_whatsapp_msg" string="Whatsapp" type="object" class="oe_stat_button"/>

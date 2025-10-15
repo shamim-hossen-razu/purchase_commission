@@ -32,6 +32,10 @@ class SendWhatsappSale(models.TransientModel):
 
         base_url = 'https://api.whatsapp.com/send'
         mobile = self.mobile or ''
+        # mobile is like +880 1741-659927
+        # i need to convert like 01741659927
+        mobile = mobile.replace(' ', '').replace('-', '')
+
         encoded_msg = urllib.parse.quote(self.message)
         url = f"{base_url}?phone={mobile}&text={encoded_msg}"
 

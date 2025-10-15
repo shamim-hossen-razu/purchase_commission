@@ -275,8 +275,7 @@
                                             <td>Untaxed Amount</td>
                                             <td> </td>
                                             <td class="text-end">
-                                                <span t-field="o.amount_untaxed"
-                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                                <span t-field="o.amount_untaxed"/>
                                             </td>
                                         </tr>
 
@@ -291,9 +290,9 @@
                                             </td>
                                             <td> </td>
                                             <td class="text-end">
-                                                <span t-out="tax_amt"
-                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                                                <span t-out="tax_amt"/>
                                             </td>
+<!--                                        t-options='{"widget":"monetary","display_currency": o.currency_id}'-->
                                         </tr>
 
                                         <!-- bold line BEFORE Total (this is the line you want) -->
@@ -310,8 +309,7 @@
                                                 <strong><t t-out="grand_qty_label"/></strong>
                                             </td>
                                             <td class="text-end">
-                                                <strong><span t-field="o.amount_total"
-                                                      t-options='{"widget":"monetary","display_currency": o.currency_id}'/></strong>
+                                                <strong><span t-field="o.amount_total"/></strong>
                                             </td>
                                         </tr>
                                     </table>
