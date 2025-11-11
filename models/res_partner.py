@@ -42,32 +42,20 @@ class ResPartner(models.Model):
         if self.mobile:
             self.mobile = self._format_mobile_number(self.mobile)
 
-    @api.constrains('name', 'mobile')
-    def _check_unique_name_mobile(self):
-        """Ensure unique combination of name and mobile"""
+
+    @api.constrains('mobile')
+    def _check_mobile_onchange(self):
+        # Mobile number must be unique
         for partner in self:
-            if partner.name and partner.mobile:
+            if partner.mobile:
                 existing_partners = self.env['res.partner'].search([
                     ('id', '!=', partner.id),
-                    ('name', '=', partner.name),
-                    ('mobile', '=', partner.mobile),
-                    ('is_company', '=', True)
+                    ('mobile', '=', partner.mobile)
                 ])
                 if existing_partners:
-                    raise ValidationError("A company with the same name and mobile number already exists.")
+                    raise ValidationError("A partner with the same mobile number already exists.")
 
-    @api.constrains('name', 'is_company')
-    def _check_unique_name(self):
-        """Ensure unique name for companies"""
-        for partner in self:
-            if partner.name and partner.is_company:
-                existing_partners = self.env['res.partner'].search([
-                    ('id', '!=', partner.id),
-                    ('name', '=', partner.name),
-                    ('is_company', '=', True)
-                ], limit=1)
-                if existing_partners:
-                    raise ValidationError("A company with the same name already exists.")
+
 
     @staticmethod
     def _format_mobile_number(mobile):
