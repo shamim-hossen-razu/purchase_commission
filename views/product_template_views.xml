@@ -14,9 +14,9 @@
             <xpath expr="//field[@name='supplier_taxes_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//page[@name='variants']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+<!--            <xpath expr="//page[@name='variants']" position="attributes">-->
+<!--                <attribute name="invisible">1</attribute>-->
+<!--            </xpath>-->
             <xpath expr="//page[@name='sales']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
