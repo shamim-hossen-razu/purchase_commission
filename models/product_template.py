@@ -13,15 +13,15 @@ class ProductTemplate(models.Model):
         string="Remote Product ID",
         help="Stores the product ID of this product in the external database.")
 
-    @api.constrains('name')
-    def _check_unique_name(self):
-        """Ensure product name is unique (case-insensitive) locally"""
-        for product in self:
-            if product.name:
-                existing = self.env['product.template'].search(
-                    [('id', '!=', product.id), ('name', '=ilike', product.name)])
-                if existing:
-                    raise ValidationError("A product with the same name already exists.")
+    # @api.constrains('name')
+    # def _check_unique_name(self):
+    #     """Ensure product name is unique (case-insensitive) locally"""
+    #     for product in self:
+    #         if product.name:
+    #             existing = self.env['product.template'].search(
+    #                 [('id', '!=', product.id), ('name', '=ilike', product.name)])
+    #             if existing:
+    #                 raise ValidationError("A product with the same name already exists.")
 
     def _get_external_config(self):
         ICP = self.env['ir.config_parameter'].sudo()
