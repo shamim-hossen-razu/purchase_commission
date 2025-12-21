@@ -23,9 +23,9 @@
 <!--            <xpath expr="//field[@name='attribute_id']" position="replace">-->
 <!--                <field name="attribute_id" options="{'no_open': True, 'no_create': True}"/>-->
 <!--            </xpath>-->
-            <xpath expr="//button[@name='%(product.product_variant_action)d']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+<!--            <xpath expr="//button[@name='%(product.product_variant_action)d']" position="attributes">-->
+<!--                <attribute name="invisible">1</attribute>-->
+<!--            </xpath>-->
 <!--            <xpath expr="//field[@name='value_ids']" position="attributes">-->
 <!--                <attribute name="options">{'no_open': True, 'no_create': True}</attribute>-->
 <!--            </xpath>-->
