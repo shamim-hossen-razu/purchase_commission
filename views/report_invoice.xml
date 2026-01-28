@@ -419,20 +419,20 @@
                                                 </td>
                                             </tr>
 
-                                            <!-- Tax -->
-                                            <t t-set="base_for_tax" t-value="o.amount_untaxed or 0.0"/>
-                                            <t t-set="tax_amt" t-value="o.amount_tax or 0.0"/>
-                                            <t t-set="tax_rate"
-                                               t-value="(tax_amt and (tax_amt / (base_for_tax or 1.0) * 100.0)) or 0.0"/>
-                                            <tr>
-                                                <td>
-                                                    <t t-out="'Tax {:.0f}% on $ {:,.2f}'.format(tax_rate, base_for_tax)"/>
-                                                </td>
-                                                <td class="text-end">
-                                                    <span t-out="tax_amt"
-                                                          t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
-                                                </td>
-                                            </tr>
+<!--                                            &lt;!&ndash; Tax &ndash;&gt;-->
+<!--                                            <t t-set="base_for_tax" t-value="o.amount_untaxed or 0.0"/>-->
+<!--                                            <t t-set="tax_amt" t-value="o.amount_tax or 0.0"/>-->
+<!--                                            <t t-set="tax_rate"-->
+<!--                                               t-value="(tax_amt and (tax_amt / (base_for_tax or 1.0) * 100.0)) or 0.0"/>-->
+<!--                                            <tr>-->
+<!--                                                <td>-->
+<!--                                                    <t t-out="'Tax {:.0f}% on $ {:,.2f}'.format(tax_rate, base_for_tax)"/>-->
+<!--                                                </td>-->
+<!--                                                <td class="text-end">-->
+<!--                                                    <span t-out="tax_amt"-->
+<!--                                                          t-options='{"widget":"monetary","display_currency": o.currency_id}'/>-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
 
                                             <!-- separator line (confined to right column width) -->
                                             <tr>

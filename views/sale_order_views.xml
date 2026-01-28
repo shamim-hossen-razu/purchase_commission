@@ -13,16 +13,9 @@
                 <xpath expr="//page[@name='order_lines']//field[@name='order_line']/list//field[@name='product_packaging_qty']" position="after">
                     <field name="set_name"/>
                 </xpath>
-                <xpath expr="//field[@name='partner_id']" position="before">
-                    <field name="remote_sale_order_id" readonly="true"/>
-                </xpath>
-                <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='product_template_id']"
-                       position="after">
-                    <field name="remote_sale_order_line_id" readonly="true"/>
-                </xpath>
                 <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='tax_id']"
-                       position="attributes">
-                    <attribute name="invisible">true</attribute>
+                       position="replace">
+                    <field name="tax_id" invisible="1"/>
                 </xpath>
                 <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='price_unit']"
                        position="attributes">
@@ -36,12 +29,6 @@
                        position="attributes">
                     <attribute name="invisible">true</attribute>
                 </xpath>
-                <xpath expr="//sheet//notebook//page[@name='order_lines']//field[@name='order_line']//list//field[@name='tax_id']"
-                       position="attributes">
-                    <attribute name="invisible">true</attribute>
-                </xpath>
-
-
                 <xpath expr="//header/button[@name='action_cancel']" position="after">
                     <button name="action_send_whatsapp_msg" string="Whatsapp" type="object" class="oe_stat_button"/>
                 </xpath>

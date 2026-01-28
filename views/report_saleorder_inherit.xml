@@ -270,35 +270,35 @@
                                         <t t-set="grand_pc" t-value="grand_pc_raw % 12"/>
                                         <t t-set="grand_qty_label" t-value="str(grand_dz) + ' / ' + str(grand_pc)"/>
 
-                                        <!-- Untaxed -->
-                                        <tr>
-                                            <td>Untaxed Amount</td>
-                                            <td> </td>
-                                            <td class="text-end">
-                                                <span t-field="o.amount_untaxed"/>
-                                            </td>
-                                        </tr>
+<!--                                        &lt;!&ndash; Untaxed &ndash;&gt;-->
+<!--                                        <tr>-->
+<!--                                            <td>Untaxed Amount</td>-->
+<!--                                            <td> </td>-->
+<!--                                            <td class="text-end">-->
+<!--                                                <span t-field="o.amount_untaxed"/>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
 
-                                        <!-- Tax (single rate display like standard screenshot) -->
-                                        <t t-set="base_for_tax" t-value="o.amount_untaxed or 0.0"/>
-                                        <t t-set="tax_amt" t-value="o.amount_tax or 0.0"/>
-                                        <t t-set="tax_rate"
-                                           t-value="(tax_amt and (tax_amt / (base_for_tax or 1.0) * 100.0)) or 0.0"/>
-                                        <tr>
-                                            <td>
-                                                <t t-out="'Tax {:.0f}% on $ {:,.2f}'.format(tax_rate, base_for_tax)"/>
-                                            </td>
-                                            <td> </td>
-                                            <td class="text-end">
-                                                <span t-out="tax_amt"/>
-                                            </td>
-<!--                                        t-options='{"widget":"monetary","display_currency": o.currency_id}'-->
-                                        </tr>
+<!--                                        &lt;!&ndash; Tax (single rate display like standard screenshot) &ndash;&gt;-->
+<!--                                        <t t-set="base_for_tax" t-value="o.amount_untaxed or 0.0"/>-->
+<!--                                        <t t-set="tax_amt" t-value="o.amount_tax or 0.0"/>-->
+<!--                                        <t t-set="tax_rate"-->
+<!--                                           t-value="(tax_amt and (tax_amt / (base_for_tax or 1.0) * 100.0)) or 0.0"/>-->
+<!--                                        <tr>-->
+<!--                                            <td>-->
+<!--                                                <t t-out="'Tax {:.0f}% on $ {:,.2f}'.format(tax_rate, base_for_tax)"/>-->
+<!--                                            </td>-->
+<!--                                            <td> </td>-->
+<!--                                            <td class="text-end">-->
+<!--                                                <span t-out="tax_amt"/>-->
+<!--                                            </td>-->
+<!--&lt;!&ndash;                                        t-options='{"widget":"monetary","display_currency": o.currency_id}'&ndash;&gt;-->
+<!--                                        </tr>-->
 
                                         <!-- bold line BEFORE Total (this is the line you want) -->
-                                        <tr>
-                                            <td colspan="3" style="border-top: 1px solid #000; height: 1px;"></td>
-                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <td colspan="3" style="border-top: 1px solid #000; height: 1px;"></td>-->
+<!--                                        </tr>-->
 
                                         <!-- Total -->
                                         <tr>
