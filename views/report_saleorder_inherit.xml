@@ -92,14 +92,14 @@
                                                     <span t-else="">---</span>
                                                 </div>
 
-                                                <div>
-                                                    <strong>District &amp; Division: </strong>
-                                                    <span t-if="o.partner_id.district_id"><t t-out="o.partner_id.district_id.name"/></span>
-                                                    <span t-else="">---</span>
-                                                    <span>, </span>
-                                                    <span t-if="o.partner_id.division_id"><t t-out="o.partner_id.division_id.name"/></span>
-                                                    <span t-else="">---</span>
-                                                </div>
+<!--                                                <div>-->
+<!--                                                    <strong>District &amp; Division: </strong>-->
+<!--                                                    <span t-if="o.partner_id.district_id"><t t-out="o.partner_id.district_id.name"/></span>-->
+<!--                                                    <span t-else="">-&#45;&#45;</span>-->
+<!--                                                    <span>, </span>-->
+<!--                                                    <span t-if="o.partner_id.division_id"><t t-out="o.partner_id.division_id.name"/></span>-->
+<!--                                                    <span t-else="">-&#45;&#45;</span>-->
+<!--                                                </div>-->
                                                 <div>
                                                     <strong>Mobile: </strong>
                                                     <span t-if="o.partner_id.mobile"><t t-out="o.partner_id.mobile"/></span>
