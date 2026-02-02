@@ -5,6 +5,7 @@ import xmlrpc.client
 import logging
 _logger = logging.getLogger(__name__)
 from copy import deepcopy
+from odoo.osv import expression
 
 
 class ResPartner(models.Model):
@@ -74,7 +75,6 @@ class ResPartner(models.Model):
         return {
             'url': ICP.get_param('purchase_commission.external_server_url', ''),
             'db': ICP.get_param('purchase_commission.external_server_db', ''),
-            'uid': int(ICP.get_param('purchase_commission.external_server_uid', 0)),
             'password': ICP.get_param('purchase_commission.external_server_password', '')
         }
 
@@ -249,3 +249,16 @@ class ResPartner(models.Model):
                         pass
 
         return super().unlink()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        if name:
+            phone_domain = expression.OR([
+                [('name', operator, name)],
+                [('mobile', operator, name)],
+            ])
+            args = expression.AND([phone_domain, args])
+        name = ''
+        res = super().name_search(name, args, operator, limit)
+        return res
