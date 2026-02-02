@@ -8,9 +8,9 @@
             <xpath expr="//field[@name='phone']" position="before">
                 <field name="bd_format_address" invisible="True"/>
             </xpath>
-            <xpath expr="//field[@name='phone']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+<!--            <xpath expr="//field[@name='phone']" position="attributes">-->
+<!--                <attribute name="invisible">1</attribute>-->
+<!--            </xpath>-->
 
             <xpath expr="//div[hasclass('o_address_format')]" position="attributes">
                 <attribute name="invisible">bd_format_address</attribute>
