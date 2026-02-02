@@ -90,6 +90,8 @@
                                                     <span>, </span>
                                                     <span t-if="o.partner_id.upazila_id"><t t-out="o.partner_id.upazila_id.name"/></span>
                                                     <span t-else="">---</span>
+                                                    <span t-if="o.partner_id.mobile"><t t-out="o.partner_id.mobile"/></span>
+                                                    <span t-else="">Mobile: N/A</span>
                                                 </div>
 
                                                 <div>
